@@ -14,11 +14,3 @@
 
 
 GSM_RECIEVE_TYPE g_type = GSM_TYPE_CHAR;
-
-
-
-
-
-
-
-
