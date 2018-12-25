@@ -328,26 +328,20 @@ help:
 *  more details in README.                                             *\n  \
 *                                                                      *\n  \
 *  \033[32m2. How to use\033[0m                                                       *\n  \
-*  First download SDK, and put RUI in the root directory of sdk.       *\n  \
-*  Second enter to ../RUI/build/ and choose chip and sensor like       *\n  \
-*  make 1bdgh and it will compile.                                     *\n  \
+*  Download SDK, put RUI in the root directory of sdk, then enter to   *\n  \
+*   ../RUI/build/ and choose chip and sensor supplied below            *\n  \
 *                                                                      *\n  \
-*  Chip and sensor supplied below                                      *\n  \
-* \033[36m please choose chip       \033[0m                                           *\n  \
+*  \033[36mComputing\033[0m      * \033[35mConnectivity\033[0m    * \033[33mSensor\033[0m                           *\n  \
 *                                                                      *\n  \
-*  \033[36m1. nRF52832   2. nRF52840  \033[0m                                         *\n  \
-*                                                                      *\n  \
-*  \033[35mplease choose sensor      \033[0m                                          *\n  \
-*                                                                      *\n  \
-*  \033[35ma. bc95-g    b. bg96    c. m35   \033[0m                                   *\n  \
-*  \033[35md. bme280    e. L_70_R  f. lis2mdl   \033[0m                               *\n  \
-*  \033[35mg. lis3dh    h. opt3001          \033[0m                                   *\n  \
+*  \033[36m1. nRF52832\033[0m    * \033[35ma. bc95-g\033[0m       * \033[33md. bme280   e. L_70_R\033[0m            *\n  \
+*  \033[36m2. nRF52840\033[0m    * \033[35mb. bg96\033[0m         * \033[33mf. lis2mdl  g. lis3dh\033[0m            *\n  \
+*                 * \033[35mc. m35\033[0m          * \033[33mh. opt3001\033[0m                       *\n  \
 *                                                                      *\n  \
 *  \033[32m3. Compile command  \033[0m                                                *\n  \
 *                                                                      *\n  \
-*  3.1 \033[31mmake clean\033[0m  -- clean all targets                                *\n  \
+*  -- \033[31mmake clean\033[0m  -- clean all targets                                 *\n  \
 *                                                                      *\n  \
-*  3.2 \033[31mmake P=chip+sensor\033[0m like below                                   *\n  \
+*  -- \033[31mmake P=chip+sensor\033[0m like below                                    *\n  \
 *  Rakwirelss board                                                    *\n  \
 *  8212 -- \033[31mmake P=1bdfgh\033[0m              8212_M -- \033[31mmake P=1bg\033[0m             *\n  \
 *  8211_G -- \033[31mmake P=1cdefgh\033[0m           8211_NB -- \033[31mmake P=1adefgh\033[0m        *\n  \
@@ -355,7 +349,7 @@ help:
 *  choose the corresponding sensor and remeber to change pin number in *\n  \
 *  RUI\Source\include\board_basic.h                                       *\n  \
 *                                                                      *\n  \
-*  3.3 \033[31mmake help\033[0m -- show RUI description                               *\n  \
+*  -- \033[31mmake help\033[0m -- show RUI description                                *\n  \
 *                                                                      *\n  \
 ************************************************************************"   \
 
