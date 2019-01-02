@@ -1,3 +1,12 @@
+***************************************************************************************************************************************
+
+Update log 2019.1.2
+  
+  Solve the bug of ble connection with nRF connect. However, it should be cautious about the size of task and priority of user's task 
+in FreeRTOS.
+  
+***************************************************************************************************************************************
+
 # RUI__Platform_Firmware_GCC
 
 **1.Overview**
