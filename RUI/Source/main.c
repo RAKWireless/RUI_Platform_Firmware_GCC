@@ -265,7 +265,7 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
 
         NRF_LOG_DEBUG("Received data from BLE NUS. Writing data on UART.");
         NRF_LOG_HEXDUMP_DEBUG(p_evt->params.rx_data.p_data, p_evt->params.rx_data.length);
-        DPRINTF(LOG_INFO, "Received data from BLE NUS %s", p_evt->params.rx_data.p_data);
+
         for (uint32_t i = 0; i < p_evt->params.rx_data.length; i++)
         {
             do
@@ -832,7 +832,7 @@ int main(void)
     xReturned = xTaskCreate(dfu_task, "dfu", 512, NULL, 1, NULL);
 #endif
 		//test task 
-    xReturned = xTaskCreate(test_task, "test", 128, NULL, 1, NULL);	
+    xReturned = xTaskCreate(test_task, "test", 512, NULL, 2, NULL);	
     // Start FreeRTOS scheduler.
 
     vTaskStartScheduler();

@@ -62,6 +62,6 @@ void test_task(void * pvParameter)
 
 #endif		  
 		  NRF_LOG_INFO("++++++++++++++++test end++++++++++++++++\r\n");	
-		  vTaskDelay(5000);
+		  vTaskDelay(10000);
 	 }
 }
