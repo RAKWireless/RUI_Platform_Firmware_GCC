@@ -137,7 +137,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/experimental_memobj \
   $(SDK_ROOT)/components/libraries/experimental_section_vars \
   $(SDK_ROOT)/components/softdevice/s132/headers \
-  $(SDK_ROOT)/components/softdevice/s132/headers/nRF52 \
+  $(SDK_ROOT)/components/softdevice/s132/headers/nrf52 \
   $(SDK_ROOT)/components/libraries/strerror \
   $(SDK_ROOT)/components/libraries/fstorage \
   $(SDK_ROOT)/components/libraries/experimental_memobj \
