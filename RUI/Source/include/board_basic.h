@@ -555,5 +555,6 @@ uint32_t GpioRead( Gpio_t *obj );
 void GpioDeinit( Gpio_t *obj );
 void rui_printf(char *pt);
 
+void delay_ms(uint32_t ms);
 
 #endif

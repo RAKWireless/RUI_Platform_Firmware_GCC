@@ -14,3 +14,15 @@
 
 
 GSM_RECIEVE_TYPE g_type = GSM_TYPE_CHAR;
+
+void delay_ms(uint32_t ms)
+{
+    nrf_delay_ms(ms);
+}
+
+
+
+
+
+
+

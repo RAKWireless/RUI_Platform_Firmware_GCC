@@ -36,10 +36,6 @@ uint32_t get_stamp(void)
     return (ticks / RTC_DEFAULT_CONFIG_FREQUENCY);
 }
 
-void delay_ms(uint32_t ms)
-{
-    nrf_delay_ms(ms);
-}
 
 uint8_t GpsParseGpsData_2( int8_t *rxBuffer)
 {

@@ -55,11 +55,11 @@ void Gps_Gpio_Init()
 void Gps_power_up( void )
 {
 	GPS_PWR_OFF;
-	nrf_delay_ms(1000);
+	delay_ms(1000);
 	GPS_PWR_ON;
 	
 	GPS_RESET_LOW;
-	nrf_delay_ms(2000);
+	delay_ms(2000);
 	GPS_RESET_HIGH;
 }
 
