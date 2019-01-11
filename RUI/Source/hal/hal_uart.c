@@ -37,11 +37,11 @@ void uart_event_handle(app_uart_evt_t * p_event)
 #if defined(L70R_TEST) ||  defined(BG96_TEST)
         if(uart_use == GPS_USE_UART)
         {
-					  uint8_t rx_data;
+            uint8_t rx_data;
             if( app_uart_get( &rx_data ) == 0 )
             {
-								Gps_data_update(rx_data);
-							  //SEGGER_RTT_printf(0, "%c", rx_data);
+                Gps_data_update(rx_data);
+                //SEGGER_RTT_printf(0, "%c", rx_data);
             }
 
         }

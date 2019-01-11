@@ -21,7 +21,7 @@ typedef struct itracker_function_stru
 	  uint32_t (*gps_get)(uint8_t *data, uint32_t len);
 	  //below api is for GSM/EDGE/LTE/NB-IOT and command not beyond 128 byte
 	  uint32_t (*communicate_send)(uint8_t *cmd);
-	  uint32_t (*communicate_response)(uint8_t *rsp, uint32_t len, uint32_t timeout,GSM_RECIEVE_TYPE type);	  
+	  uint32_t (*communicate_response)(uint8_t *rsp, uint32_t len, uint32_t timeout,GSM_RECEIVE_TYPE type);	  
 	
 }itracker_function_stru;
 

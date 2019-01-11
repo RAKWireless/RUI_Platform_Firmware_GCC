@@ -276,7 +276,8 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
                     NRF_LOG_ERROR("Failed receiving NUS message. Error 0x%x. ", err_code);
                     APP_ERROR_CHECK(err_code);
                 }
-            } while (err_code == NRF_ERROR_BUSY);
+            }
+            while (err_code == NRF_ERROR_BUSY);
         }
         if (p_evt->params.rx_data.p_data[p_evt->params.rx_data.length - 1] == '\r')
         {
@@ -527,7 +528,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
  *
  * @details This function initializes the SoftDevice and the BLE event interrupt.
  */
-	void test(char *s);
+void test(char *s);
 
 static void ble_stack_init(void)
 {
@@ -803,7 +804,7 @@ int main(void)
 {
     uint32_t err_code;
     bool erase_bonds;
-	BaseType_t xReturned;
+    BaseType_t xReturned;
     int ret;
     log_init();
     //clock init
@@ -828,11 +829,11 @@ int main(void)
     // Create a FreeRTOS task for the BLE stack. The task will run advertising_start() before entering its loop.
     nrf_sdh_freertos_init(advertising_start, NULL);
 #ifdef DFU_TEST
-		// dfu task is the only background task
+    // dfu task is the only background task
     xReturned = xTaskCreate(dfu_task, "dfu", 512, NULL, 1, NULL);
 #endif
-		//test task 
-    xReturned = xTaskCreate(test_task, "test", 512, NULL, 2, NULL);	
+    //test task
+    xReturned = xTaskCreate(test_task, "test", 512, NULL, 2, NULL);
     // Start FreeRTOS scheduler.
 
     vTaskStartScheduler();

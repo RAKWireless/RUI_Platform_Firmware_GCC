@@ -23,57 +23,57 @@ void spi_event_handler(nrf_drv_spi_evt_t const * p_event, void * p_context)
 uint32_t rak_spi_init(const nrf_drv_spi_config_t *spi_config)
 {
     uint32_t err_code;
-    
+
     err_code = nrf_drv_spi_init(&spi, spi_config, spi_event_handler, NULL);
     if(err_code != NRF_SUCCESS)
-	  {
-		    return err_code;
-	  }
-	
-	  return NRF_SUCCESS;
+    {
+        return err_code;
+    }
+
+    return NRF_SUCCESS;
 }
 
 void rak_spi_deinit(void)
 {
-		nrf_drv_spi_uninit(&spi);
+    nrf_drv_spi_uninit(&spi);
 }
 
 uint32_t rak_spi_write(uint8_t reg, uint8_t *data, uint16_t len)
 {
     uint32_t err_code;
-		uint32_t timeout = SPI_TIMEOUT;
-	
-		spi_xfer_done = false;
+    uint32_t timeout = SPI_TIMEOUT;
+
+    spi_xfer_done = false;
     SPI_Tx_Buf[0] = reg;
-		memcpy(&SPI_Tx_Buf[1], data, len);
-	
-		err_code = nrf_drv_spi_transfer(&spi, SPI_Tx_Buf, len+1, NULL, 0);
+    memcpy(&SPI_Tx_Buf[1], data, len);
+
+    err_code = nrf_drv_spi_transfer(&spi, SPI_Tx_Buf, len+1, NULL, 0);
     if(err_code != NRF_SUCCESS)
-	  {
-		    return err_code;
-	  }
-		while((!spi_xfer_done) && --timeout);
+    {
+        return err_code;
+    }
+    while((!spi_xfer_done) && --timeout);
     if(!timeout) return NRF_ERROR_TIMEOUT;
-	
+
     return err_code;
 }
 
 uint8_t rak_spi_read(uint8_t reg, uint8_t * data, uint16_t len)
 {
     uint32_t err_code;
-		uint32_t timeout = SPI_TIMEOUT;
-	
+    uint32_t timeout = SPI_TIMEOUT;
+
     spi_xfer_done = false;
-    SPI_Tx_Buf[0] = reg;	
-	
-		err_code = nrf_drv_spi_transfer(&spi, SPI_Tx_Buf, 1, SPI_Rx_Buf, len+1);
+    SPI_Tx_Buf[0] = reg;
+
+    err_code = nrf_drv_spi_transfer(&spi, SPI_Tx_Buf, 1, SPI_Rx_Buf, len+1);
     if(err_code != NRF_SUCCESS)
-	  {
-		    return err_code;
-	  }
-		while((!spi_xfer_done) && --timeout);
+    {
+        return err_code;
+    }
+    while((!spi_xfer_done) && --timeout);
     if(!timeout) return NRF_ERROR_TIMEOUT;
-		
+
     memcpy(data, &SPI_Rx_Buf[1], len);
     return err_code;
 }

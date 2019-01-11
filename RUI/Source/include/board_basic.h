@@ -22,11 +22,11 @@
 #endif
 
 
-typedef enum GSM_RECIEVE_TYPE
+typedef enum GSM_RECEIVE_TYPE
 {
 	GSM_TYPE_CHAR,
 	GSM_TYPE_FILE,
-}GSM_RECIEVE_TYPE;
+}GSM_RECEIVE_TYPE;
 
 
 /*!

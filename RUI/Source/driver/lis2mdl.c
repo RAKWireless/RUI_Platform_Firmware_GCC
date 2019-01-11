@@ -52,28 +52,29 @@ lis2mdl_ctx_t dev_ctx;
 uint32_t lis2mdl_twi_init(void)
 {
     uint32_t err_code;
-    
-    const nrf_drv_twi_config_t twi_lis_config = {
-       .scl                = LIS2MDL_TWI_SCL_PIN,
-       .sda                = LIS2MDL_TWI_SDA_PIN,
-       .frequency          = NRF_TWI_FREQ_400K,
-       .interrupt_priority = APP_IRQ_PRIORITY_HIGHEST
+
+    const nrf_drv_twi_config_t twi_lis_config =
+    {
+        .scl                = LIS2MDL_TWI_SCL_PIN,
+        .sda                = LIS2MDL_TWI_SDA_PIN,
+        .frequency          = NRF_TWI_FREQ_400K,
+        .interrupt_priority = APP_IRQ_PRIORITY_HIGHEST
     };
     rak_i2c_deinit();
     err_code = rak_i2c_init(&twi_lis_config);
     if(err_code != NRF_SUCCESS)
-	  {
-		    return err_code;
-	  }
-	
-	  return NRF_SUCCESS;
+    {
+        return err_code;
+    }
+
+    return NRF_SUCCESS;
 }
 
 static int32_t platform_write(void *handle, uint8_t Reg, uint8_t *Bufp,
                               uint16_t len)
 {
     uint32_t err_code;
-		err_code = rak_i2c_write(LIS2MDL_ADDR, Reg, Bufp, len);
+    err_code = rak_i2c_write(LIS2MDL_ADDR, Reg, Bufp, len);
     return err_code;
 }
 
@@ -81,8 +82,8 @@ static int32_t platform_write(void *handle, uint8_t Reg, uint8_t *Bufp,
 static int32_t platform_read(void *handle, uint8_t Reg, uint8_t *Bufp,
                              uint16_t len)
 {
-		uint32_t err_code;
-		err_code = rak_i2c_read(LIS2MDL_ADDR, Reg, Bufp, len);
+    uint32_t err_code;
+    err_code = rak_i2c_read(LIS2MDL_ADDR, Reg, Bufp, len);
     return err_code;
 }
 
@@ -90,66 +91,69 @@ static int32_t platform_read(void *handle, uint8_t Reg, uint8_t *Bufp,
 int lis2mdl_init(void)
 {
     uint32_t err_code;
-		
-	  //³õÊ¼»¯TWI
-	  err_code = lis2mdl_twi_init();
+
+    //³õÊ¼»¯TWI
+    err_code = lis2mdl_twi_init();
     if(err_code != NRF_SUCCESS) return -1;
-	
-		/*
-		 *  Initialize mems driver interface
-		 */
 
-		dev_ctx.write_reg = platform_write;
-		dev_ctx.read_reg = platform_read;
+    /*
+     *  Initialize mems driver interface
+     */
 
-		uint8_t whoamI, rst;
-		/*
-		 *  Check device ID
-		 */
-		whoamI = 0;
-		lis2mdl_device_id_get(&dev_ctx, &whoamI);
-		if ( whoamI != LIS2MDL_ID ) {
-			//while(1); /*manage here device not found */
-			return -1;
-		}
-		/*
-		 *  Restore default configuration
-		 */
-		lis2mdl_reset_set(&dev_ctx, PROPERTY_ENABLE);
-		do {
-			lis2mdl_reset_get(&dev_ctx, &rst);
-		} while (rst);
-		/*
-		 *  Enable Block Data Update
-		 */
-		lis2mdl_block_data_update_set(&dev_ctx, PROPERTY_ENABLE);
-		/*
-		 * Set Output Data Rate
-		 */
-		lis2mdl_data_rate_set(&dev_ctx, LIS2MDL_ODR_10Hz);
-		/*
-		 * Set / Reset sensor mode
-		 */  
-		lis2mdl_set_rst_mode_set(&dev_ctx, LIS2MDL_SENS_OFF_CANC_EVERY_ODR);
-		/*
-		 * Enable temperature compensation
-		 */  
-		lis2mdl_offset_temp_comp_set(&dev_ctx, PROPERTY_ENABLE);
-		/*
-		 * Set device in continuos mode
-		 */   
-		lis2mdl_operating_mode_set(&dev_ctx, LIS2MDL_CONTINUOUS_MODE);
-		
+    dev_ctx.write_reg = platform_write;
+    dev_ctx.read_reg = platform_read;
+
+    uint8_t whoamI, rst;
+    /*
+     *  Check device ID
+     */
+    whoamI = 0;
+    lis2mdl_device_id_get(&dev_ctx, &whoamI);
+    if ( whoamI != LIS2MDL_ID )
+    {
+        //while(1); /*manage here device not found */
+        return -1;
+    }
+    /*
+     *  Restore default configuration
+     */
+    lis2mdl_reset_set(&dev_ctx, PROPERTY_ENABLE);
+    do
+    {
+        lis2mdl_reset_get(&dev_ctx, &rst);
+    }
+    while (rst);
+    /*
+     *  Enable Block Data Update
+     */
+    lis2mdl_block_data_update_set(&dev_ctx, PROPERTY_ENABLE);
+    /*
+     * Set Output Data Rate
+     */
+    lis2mdl_data_rate_set(&dev_ctx, LIS2MDL_ODR_10Hz);
+    /*
+     * Set / Reset sensor mode
+     */
+    lis2mdl_set_rst_mode_set(&dev_ctx, LIS2MDL_SENS_OFF_CANC_EVERY_ODR);
+    /*
+     * Enable temperature compensation
+     */
+    lis2mdl_offset_temp_comp_set(&dev_ctx, PROPERTY_ENABLE);
+    /*
+     * Set device in continuos mode
+     */
+    lis2mdl_operating_mode_set(&dev_ctx, LIS2MDL_CONTINUOUS_MODE);
+
     return 0;
 }
 
 
 void get_lis2mdl_data(float *magnetic_x, float *magnetic_y, float *magnetic_z)
 {
-	axis3bit16_t data_raw_magnetic;
-	axis1bit16_t data_raw_temperature;
-	float magnetic_mG[3];
-	float temperature_degC;
+    axis3bit16_t data_raw_magnetic;
+    axis1bit16_t data_raw_temperature;
+    float magnetic_mG[3];
+    float temperature_degC;
 //	uint8_t whoamI, rst;
 //	 /*
 //   *  Check device ID
@@ -175,51 +179,51 @@ void get_lis2mdl_data(float *magnetic_x, float *magnetic_y, float *magnetic_z)
 //  lis2mdl_data_rate_set(&dev_ctx, LIS2MDL_ODR_10Hz);
 //  /*
 //   * Set / Reset sensor mode
-//   */  
+//   */
 //  lis2mdl_set_rst_mode_set(&dev_ctx, LIS2MDL_SENS_OFF_CANC_EVERY_ODR);
 //  /*
 //   * Enable temperature compensation
-//   */  
+//   */
 //  lis2mdl_offset_temp_comp_set(&dev_ctx, PROPERTY_ENABLE);
 //  /*
 //   * Set device in continuos mode
-//   */   
+//   */
 //  lis2mdl_operating_mode_set(&dev_ctx, LIS2MDL_CONTINUOUS_MODE);
-  
-  /*
-   * Read samples in polling mode (no int)
-   */
-	uint8_t cnt=1;
-	uint8_t valid=0;
-  while(cnt--)
-  {
-    /*
-     * Read output only if new value is available
-     */
-    lis2mdl_reg_t reg;
-    lis2mdl_status_get(&dev_ctx, &reg.status_reg);
 
-    if (reg.status_reg.zyxda)
+    /*
+     * Read samples in polling mode (no int)
+     */
+    uint8_t cnt=1;
+    uint8_t valid=0;
+    while(cnt--)
     {
-      /* Read magnetic field data */
-      memset(data_raw_magnetic.u8bit, 0x00, 3*sizeof(int16_t));
-      lis2mdl_magnetic_raw_get(&dev_ctx, data_raw_magnetic.u8bit);
-      *magnetic_x = LIS2MDL_FROM_LSB_TO_mG( data_raw_magnetic.i16bit[0]);
-      *magnetic_y = LIS2MDL_FROM_LSB_TO_mG( data_raw_magnetic.i16bit[1]);
-      *magnetic_z = LIS2MDL_FROM_LSB_TO_mG( data_raw_magnetic.i16bit[2]);
-      
+        /*
+         * Read output only if new value is available
+         */
+        lis2mdl_reg_t reg;
+        lis2mdl_status_get(&dev_ctx, &reg.status_reg);
+
+        if (reg.status_reg.zyxda)
+        {
+            /* Read magnetic field data */
+            memset(data_raw_magnetic.u8bit, 0x00, 3*sizeof(int16_t));
+            lis2mdl_magnetic_raw_get(&dev_ctx, data_raw_magnetic.u8bit);
+            *magnetic_x = LIS2MDL_FROM_LSB_TO_mG( data_raw_magnetic.i16bit[0]);
+            *magnetic_y = LIS2MDL_FROM_LSB_TO_mG( data_raw_magnetic.i16bit[1]);
+            *magnetic_z = LIS2MDL_FROM_LSB_TO_mG( data_raw_magnetic.i16bit[2]);
+
 //      sprintf((char*)buf, "%4.2f\t%4.2f\t%4.2f\r\n",
 //              magnetic_mG[0], magnetic_mG[1], magnetic_mG[2]);
 //      DPRINTF(LOG_INFO, "%s", buf);
-			valid = 1;
-			
+            valid = 1;
+
+        }
     }
-  }
 }
 
 void lis2mdl_deinit()
 {
-		rak_i2c_deinit();
+    rak_i2c_deinit();
 }
 
 /**
@@ -248,7 +252,7 @@ void lis2mdl_deinit()
 int32_t lis2mdl_read_reg(lis2mdl_ctx_t* ctx, uint8_t reg, uint8_t* data,
                          uint16_t len)
 {
-  return ctx->read_reg(ctx->handle, reg, data, len);
+    return ctx->read_reg(ctx->handle, reg, data, len);
 }
 
 /**
@@ -263,7 +267,7 @@ int32_t lis2mdl_read_reg(lis2mdl_ctx_t* ctx, uint8_t reg, uint8_t* data,
 int32_t lis2mdl_write_reg(lis2mdl_ctx_t* ctx, uint8_t reg, uint8_t* data,
                           uint16_t len)
 {
-  return ctx->write_reg(ctx->handle, reg, data, len);
+    return ctx->write_reg(ctx->handle, reg, data, len);
 }
 
 /**
@@ -292,7 +296,7 @@ int32_t lis2mdl_write_reg(lis2mdl_ctx_t* ctx, uint8_t reg, uint8_t* data,
   */
 int32_t lis2mdl_mag_user_offset_set(lis2mdl_ctx_t *ctx, uint8_t *buff)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_OFFSET_X_REG_L, buff, 6);
+    return lis2mdl_read_reg(ctx, LIS2MDL_OFFSET_X_REG_L, buff, 6);
 }
 
 /**
@@ -311,7 +315,7 @@ int32_t lis2mdl_mag_user_offset_set(lis2mdl_ctx_t *ctx, uint8_t *buff)
   */
 int32_t lis2mdl_mag_user_offset_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_OFFSET_X_REG_L, buff, 6);
+    return lis2mdl_read_reg(ctx, LIS2MDL_OFFSET_X_REG_L, buff, 6);
 }
 
 /**
@@ -323,14 +327,14 @@ int32_t lis2mdl_mag_user_offset_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
   */
 int32_t lis2mdl_operating_mode_set(lis2mdl_ctx_t *ctx, lis2mdl_md_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  reg.cfg_reg_a.md = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    reg.cfg_reg_a.md = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -342,13 +346,13 @@ int32_t lis2mdl_operating_mode_set(lis2mdl_ctx_t *ctx, lis2mdl_md_t val)
   */
 int32_t lis2mdl_operating_mode_get(lis2mdl_ctx_t *ctx, lis2mdl_md_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  *val = (lis2mdl_md_t) reg.cfg_reg_a.md;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    *val = (lis2mdl_md_t) reg.cfg_reg_a.md;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -360,14 +364,14 @@ int32_t lis2mdl_operating_mode_get(lis2mdl_ctx_t *ctx, lis2mdl_md_t *val)
   */
 int32_t lis2mdl_data_rate_set(lis2mdl_ctx_t *ctx, lis2mdl_odr_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  reg.cfg_reg_a.odr = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    reg.cfg_reg_a.odr = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -379,13 +383,13 @@ int32_t lis2mdl_data_rate_set(lis2mdl_ctx_t *ctx, lis2mdl_odr_t val)
   */
 int32_t lis2mdl_data_rate_get(lis2mdl_ctx_t *ctx, lis2mdl_odr_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  *val = (lis2mdl_odr_t) reg.cfg_reg_a.odr;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    *val = (lis2mdl_odr_t) reg.cfg_reg_a.odr;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -397,14 +401,14 @@ int32_t lis2mdl_data_rate_get(lis2mdl_ctx_t *ctx, lis2mdl_odr_t *val)
   */
 int32_t lis2mdl_power_mode_set(lis2mdl_ctx_t *ctx, lis2mdl_lp_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  reg.cfg_reg_a.lp = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    reg.cfg_reg_a.lp = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -416,13 +420,13 @@ int32_t lis2mdl_power_mode_set(lis2mdl_ctx_t *ctx, lis2mdl_lp_t val)
   */
 int32_t lis2mdl_power_mode_get(lis2mdl_ctx_t *ctx, lis2mdl_lp_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  *val = (lis2mdl_lp_t) reg.cfg_reg_a.lp;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    *val = (lis2mdl_lp_t) reg.cfg_reg_a.lp;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -435,14 +439,14 @@ int32_t lis2mdl_power_mode_get(lis2mdl_ctx_t *ctx, lis2mdl_lp_t *val)
   */
 int32_t lis2mdl_offset_temp_comp_set(lis2mdl_ctx_t *ctx, uint8_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  reg.cfg_reg_a.comp_temp_en = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    reg.cfg_reg_a.comp_temp_en = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -455,13 +459,13 @@ int32_t lis2mdl_offset_temp_comp_set(lis2mdl_ctx_t *ctx, uint8_t val)
   */
 int32_t lis2mdl_offset_temp_comp_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  *val = reg.cfg_reg_a.comp_temp_en;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    *val = reg.cfg_reg_a.comp_temp_en;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -474,14 +478,14 @@ int32_t lis2mdl_offset_temp_comp_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 int32_t lis2mdl_low_pass_bandwidth_set(lis2mdl_ctx_t *ctx,
                                        lis2mdl_lpf_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
-  reg.cfg_reg_b.lpf = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    reg.cfg_reg_b.lpf = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -494,13 +498,13 @@ int32_t lis2mdl_low_pass_bandwidth_set(lis2mdl_ctx_t *ctx,
 int32_t lis2mdl_low_pass_bandwidth_get(lis2mdl_ctx_t *ctx,
                                        lis2mdl_lpf_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
-  *val = (lis2mdl_lpf_t) reg.cfg_reg_b.lpf;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    *val = (lis2mdl_lpf_t) reg.cfg_reg_b.lpf;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -513,14 +517,14 @@ int32_t lis2mdl_low_pass_bandwidth_get(lis2mdl_ctx_t *ctx,
   */
 int32_t lis2mdl_set_rst_mode_set(lis2mdl_ctx_t *ctx, lis2mdl_set_rst_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
-  reg.cfg_reg_b.set_rst = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    reg.cfg_reg_b.set_rst = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -532,13 +536,13 @@ int32_t lis2mdl_set_rst_mode_set(lis2mdl_ctx_t *ctx, lis2mdl_set_rst_t val)
   */
 int32_t lis2mdl_set_rst_mode_get(lis2mdl_ctx_t *ctx, lis2mdl_set_rst_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
-  *val = (lis2mdl_set_rst_t) reg.cfg_reg_b.set_rst;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    *val = (lis2mdl_set_rst_t) reg.cfg_reg_b.set_rst;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -558,14 +562,14 @@ int32_t lis2mdl_set_rst_mode_get(lis2mdl_ctx_t *ctx, lis2mdl_set_rst_t *val)
   */
 int32_t lis2mdl_set_rst_sensor_single_set(lis2mdl_ctx_t *ctx, uint8_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
-  reg.cfg_reg_b.off_canc_one_shot = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    reg.cfg_reg_b.off_canc_one_shot = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -584,13 +588,13 @@ int32_t lis2mdl_set_rst_sensor_single_set(lis2mdl_ctx_t *ctx, uint8_t val)
   */
 int32_t lis2mdl_set_rst_sensor_single_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
-  *val = reg.cfg_reg_b.off_canc_one_shot;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    *val = reg.cfg_reg_b.off_canc_one_shot;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -602,14 +606,14 @@ int32_t lis2mdl_set_rst_sensor_single_get(lis2mdl_ctx_t *ctx, uint8_t *val)
   */
 int32_t lis2mdl_block_data_update_set(lis2mdl_ctx_t *ctx, uint8_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  reg.cfg_reg_c.bdu = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    reg.cfg_reg_c.bdu = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -621,13 +625,13 @@ int32_t lis2mdl_block_data_update_set(lis2mdl_ctx_t *ctx, uint8_t val)
   */
 int32_t lis2mdl_block_data_update_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  *val = reg.cfg_reg_c.bdu;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    *val = reg.cfg_reg_c.bdu;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -639,13 +643,13 @@ int32_t lis2mdl_block_data_update_get(lis2mdl_ctx_t *ctx, uint8_t *val)
   */
 int32_t lis2mdl_mag_data_ready_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_STATUS_REG, &reg.byte, 1);
-  *val = reg.status_reg.zyxda;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_STATUS_REG, &reg.byte, 1);
+    *val = reg.status_reg.zyxda;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -657,13 +661,13 @@ int32_t lis2mdl_mag_data_ready_get(lis2mdl_ctx_t *ctx, uint8_t *val)
   */
 int32_t lis2mdl_mag_data_ovr_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_STATUS_REG, &reg.byte, 1);
-  *val = reg.status_reg.zyxor;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_STATUS_REG, &reg.byte, 1);
+    *val = reg.status_reg.zyxor;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -675,7 +679,7 @@ int32_t lis2mdl_mag_data_ovr_get(lis2mdl_ctx_t *ctx, uint8_t *val)
   */
 int32_t lis2mdl_magnetic_raw_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_OUTX_L_REG, buff, 6);
+    return lis2mdl_read_reg(ctx, LIS2MDL_OUTX_L_REG, buff, 6);
 }
 
 /**
@@ -687,7 +691,7 @@ int32_t lis2mdl_magnetic_raw_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
   */
 int32_t lis2mdl_temperature_raw_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_TEMP_OUT_L_REG, buff, 2);
+    return lis2mdl_read_reg(ctx, LIS2MDL_TEMP_OUT_L_REG, buff, 2);
 }
 
 /**
@@ -709,7 +713,7 @@ int32_t lis2mdl_temperature_raw_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
   */
 int32_t lis2mdl_device_id_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_WHO_AM_I, buff, 1);
+    return lis2mdl_read_reg(ctx, LIS2MDL_WHO_AM_I, buff, 1);
 }
 
 /**
@@ -722,14 +726,14 @@ int32_t lis2mdl_device_id_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
   */
 int32_t lis2mdl_reset_set(lis2mdl_ctx_t *ctx, uint8_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  reg.cfg_reg_a.soft_rst = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    reg.cfg_reg_a.soft_rst = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -742,13 +746,13 @@ int32_t lis2mdl_reset_set(lis2mdl_ctx_t *ctx, uint8_t val)
   */
 int32_t lis2mdl_reset_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  *val = reg.cfg_reg_a.soft_rst;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    *val = reg.cfg_reg_a.soft_rst;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -761,14 +765,14 @@ int32_t lis2mdl_reset_get(lis2mdl_ctx_t *ctx, uint8_t *val)
   */
 int32_t lis2mdl_boot_set(lis2mdl_ctx_t *ctx, uint8_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  reg.cfg_reg_a.reboot = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    reg.cfg_reg_a.reboot = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -781,13 +785,13 @@ int32_t lis2mdl_boot_set(lis2mdl_ctx_t *ctx, uint8_t val)
   */
 int32_t lis2mdl_boot_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
-  *val = reg.cfg_reg_a.reboot;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_A, &reg.byte, 1);
+    *val = reg.cfg_reg_a.reboot;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -799,14 +803,14 @@ int32_t lis2mdl_boot_get(lis2mdl_ctx_t *ctx, uint8_t *val)
   */
 int32_t lis2mdl_self_test_set(lis2mdl_ctx_t *ctx, uint8_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  reg.cfg_reg_c.self_test = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    reg.cfg_reg_c.self_test = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -818,13 +822,13 @@ int32_t lis2mdl_self_test_set(lis2mdl_ctx_t *ctx, uint8_t val)
   */
 int32_t lis2mdl_self_test_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  *val = reg.cfg_reg_c.self_test;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    *val = reg.cfg_reg_c.self_test;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -836,14 +840,14 @@ int32_t lis2mdl_self_test_get(lis2mdl_ctx_t *ctx, uint8_t *val)
   */
 int32_t lis2mdl_data_format_set(lis2mdl_ctx_t *ctx, lis2mdl_ble_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  reg.cfg_reg_c.ble = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    reg.cfg_reg_c.ble = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -855,13 +859,13 @@ int32_t lis2mdl_data_format_set(lis2mdl_ctx_t *ctx, lis2mdl_ble_t val)
   */
 int32_t lis2mdl_data_format_get(lis2mdl_ctx_t *ctx, lis2mdl_ble_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  *val = (lis2mdl_ble_t) reg.cfg_reg_c.ble;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    *val = (lis2mdl_ble_t) reg.cfg_reg_c.ble;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -873,7 +877,7 @@ int32_t lis2mdl_data_format_get(lis2mdl_ctx_t *ctx, lis2mdl_ble_t *val)
   */
 int32_t lis2mdl_status_get(lis2mdl_ctx_t *ctx, lis2mdl_status_reg_t *val)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_STATUS_REG, (uint8_t*) val, 1);
+    return lis2mdl_read_reg(ctx, LIS2MDL_STATUS_REG, (uint8_t*) val, 1);
 }
 
 /**
@@ -899,14 +903,14 @@ int32_t lis2mdl_status_get(lis2mdl_ctx_t *ctx, lis2mdl_status_reg_t *val)
 int32_t lis2mdl_offset_int_conf_set(lis2mdl_ctx_t *ctx,
                                     lis2mdl_int_on_dataoff_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
-  reg.cfg_reg_b.int_on_dataoff = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    reg.cfg_reg_b.int_on_dataoff = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -922,13 +926,13 @@ int32_t lis2mdl_offset_int_conf_set(lis2mdl_ctx_t *ctx,
 int32_t lis2mdl_offset_int_conf_get(lis2mdl_ctx_t *ctx,
                                     lis2mdl_int_on_dataoff_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
-  *val = (lis2mdl_int_on_dataoff_t) reg.cfg_reg_b.int_on_dataoff;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_B, &reg.byte, 1);
+    *val = (lis2mdl_int_on_dataoff_t) reg.cfg_reg_b.int_on_dataoff;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -940,14 +944,14 @@ int32_t lis2mdl_offset_int_conf_get(lis2mdl_ctx_t *ctx,
   */
 int32_t lis2mdl_drdy_on_pin_set(lis2mdl_ctx_t *ctx, uint8_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  reg.cfg_reg_c.drdy_on_pin = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    reg.cfg_reg_c.drdy_on_pin = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -959,13 +963,13 @@ int32_t lis2mdl_drdy_on_pin_set(lis2mdl_ctx_t *ctx, uint8_t val)
   */
 int32_t lis2mdl_drdy_on_pin_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  *val = reg.cfg_reg_c.drdy_on_pin;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    *val = reg.cfg_reg_c.drdy_on_pin;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -977,14 +981,14 @@ int32_t lis2mdl_drdy_on_pin_get(lis2mdl_ctx_t *ctx, uint8_t *val)
   */
 int32_t lis2mdl_int_on_pin_set(lis2mdl_ctx_t *ctx, uint8_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  reg.cfg_reg_c.int_on_pin = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    reg.cfg_reg_c.int_on_pin = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -996,13 +1000,13 @@ int32_t lis2mdl_int_on_pin_set(lis2mdl_ctx_t *ctx, uint8_t val)
   */
 int32_t lis2mdl_int_on_pin_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  *val = reg.cfg_reg_c.int_on_pin;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    *val = reg.cfg_reg_c.int_on_pin;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -1015,7 +1019,7 @@ int32_t lis2mdl_int_on_pin_get(lis2mdl_ctx_t *ctx, uint8_t *val)
 int32_t lis2mdl_int_gen_conf_set(lis2mdl_ctx_t *ctx,
                                  lis2mdl_int_crtl_reg_t *val)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_INT_CRTL_REG, (uint8_t*) val, 1);
+    return lis2mdl_read_reg(ctx, LIS2MDL_INT_CRTL_REG, (uint8_t*) val, 1);
 }
 
 /**
@@ -1028,7 +1032,7 @@ int32_t lis2mdl_int_gen_conf_set(lis2mdl_ctx_t *ctx,
 int32_t lis2mdl_int_gen_conf_get(lis2mdl_ctx_t *ctx,
                                  lis2mdl_int_crtl_reg_t *val)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_INT_CRTL_REG, (uint8_t*) val, 1);
+    return lis2mdl_read_reg(ctx, LIS2MDL_INT_CRTL_REG, (uint8_t*) val, 1);
 }
 
 /**
@@ -1041,7 +1045,7 @@ int32_t lis2mdl_int_gen_conf_get(lis2mdl_ctx_t *ctx,
 int32_t lis2mdl_int_gen_source_get(lis2mdl_ctx_t *ctx,
                                    lis2mdl_int_source_reg_t *val)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_INT_SOURCE_REG, (uint8_t*) val, 1);
+    return lis2mdl_read_reg(ctx, LIS2MDL_INT_SOURCE_REG, (uint8_t*) val, 1);
 }
 
 /**
@@ -1057,7 +1061,7 @@ int32_t lis2mdl_int_gen_source_get(lis2mdl_ctx_t *ctx,
   */
 int32_t lis2mdl_int_gen_treshold_set(lis2mdl_ctx_t *ctx, uint8_t *buff)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_INT_THS_L_REG, buff, 2);
+    return lis2mdl_read_reg(ctx, LIS2MDL_INT_THS_L_REG, buff, 2);
 }
 
 /**
@@ -1073,7 +1077,7 @@ int32_t lis2mdl_int_gen_treshold_set(lis2mdl_ctx_t *ctx, uint8_t *buff)
   */
 int32_t lis2mdl_int_gen_treshold_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
 {
-  return lis2mdl_read_reg(ctx, LIS2MDL_INT_THS_L_REG, buff, 2);
+    return lis2mdl_read_reg(ctx, LIS2MDL_INT_THS_L_REG, buff, 2);
 }
 
 /**
@@ -1096,14 +1100,14 @@ int32_t lis2mdl_int_gen_treshold_get(lis2mdl_ctx_t *ctx, uint8_t *buff)
   */
 int32_t lis2mdl_i2c_interface_set(lis2mdl_ctx_t *ctx, lis2mdl_i2c_dis_t val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  reg.cfg_reg_c.i2c_dis = val;
-  mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    reg.cfg_reg_c.i2c_dis = val;
+    mm_error = lis2mdl_write_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
 
-  return mm_error;
+    return mm_error;
 }
 
 /**
@@ -1115,13 +1119,13 @@ int32_t lis2mdl_i2c_interface_set(lis2mdl_ctx_t *ctx, lis2mdl_i2c_dis_t val)
   */
 int32_t lis2mdl_i2c_interface_get(lis2mdl_ctx_t *ctx, lis2mdl_i2c_dis_t *val)
 {
-  lis2mdl_reg_t reg;
-  int32_t mm_error;
+    lis2mdl_reg_t reg;
+    int32_t mm_error;
 
-  mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
-  *val = (lis2mdl_i2c_dis_t) reg.cfg_reg_c.i2c_dis;
+    mm_error = lis2mdl_read_reg(ctx, LIS2MDL_CFG_REG_C, &reg.byte, 1);
+    *val = (lis2mdl_i2c_dis_t) reg.cfg_reg_c.i2c_dis;
 
-  return mm_error;
+    return mm_error;
 }
 
 /**

@@ -45,24 +45,24 @@ NRF_LOG_MODULE_REGISTER();
  */
 #if defined (__CC_ARM )
 
-    uint8_t m_dfu_settings_buffer[BOOTLOADER_SETTINGS_PAGE_SIZE]
-        __attribute__((at(BOOTLOADER_SETTINGS_ADDRESS)))
-        __attribute__((used));
+uint8_t m_dfu_settings_buffer[BOOTLOADER_SETTINGS_PAGE_SIZE]
+__attribute__((at(BOOTLOADER_SETTINGS_ADDRESS)))
+__attribute__((used));
 
 #elif defined ( __GNUC__ ) || defined ( __SES_ARM )
 
-    uint8_t m_dfu_settings_buffer[BOOTLOADER_SETTINGS_PAGE_SIZE]
-        __attribute__((section(".bootloader_settings_page")))
-        __attribute__((used));
+uint8_t m_dfu_settings_buffer[BOOTLOADER_SETTINGS_PAGE_SIZE]
+__attribute__((section(".bootloader_settings_page")))
+__attribute__((used));
 
 #elif defined ( __ICCARM__ )
 
-    __no_init __root uint8_t m_dfu_settings_buffer[BOOTLOADER_SETTINGS_PAGE_SIZE]
-        @ BOOTLOADER_SETTINGS_ADDRESS;
+__no_init __root uint8_t m_dfu_settings_buffer[BOOTLOADER_SETTINGS_PAGE_SIZE]
+@ BOOTLOADER_SETTINGS_ADDRESS;
 
 #else
 
-    #error Not a valid compiler/linker for m_dfu_settings placement.
+#error Not a valid compiler/linker for m_dfu_settings placement.
 
 #endif // Compiler specific
 
@@ -74,23 +74,23 @@ NRF_LOG_MODULE_REGISTER();
  */
 #if defined ( __CC_ARM )
 
-    uint8_t m_mbr_params_page[NRF_MBR_PARAMS_PAGE_SIZE]
-        __attribute__((at(NRF_MBR_PARAMS_PAGE_ADDRESS)))
-        __attribute__((used));
+uint8_t m_mbr_params_page[NRF_MBR_PARAMS_PAGE_SIZE]
+__attribute__((at(NRF_MBR_PARAMS_PAGE_ADDRESS)))
+__attribute__((used));
 
 #elif defined ( __GNUC__ ) || defined ( __SES_ARM )
 
-    uint8_t m_mbr_params_page[NRF_MBR_PARAMS_PAGE_SIZE]
-        __attribute__ ((section(".mbr_params_page")));
+uint8_t m_mbr_params_page[NRF_MBR_PARAMS_PAGE_SIZE]
+__attribute__ ((section(".mbr_params_page")));
 
 #elif defined ( __ICCARM__ )
 
-    __no_init uint8_t m_mbr_params_page[NRF_MBR_PARAMS_PAGE_SIZE]
-        @ NRF_MBR_PARAMS_PAGE_ADDRESS;
+__no_init uint8_t m_mbr_params_page[NRF_MBR_PARAMS_PAGE_SIZE]
+@ NRF_MBR_PARAMS_PAGE_ADDRESS;
 
 #else
 
-    #error Not a valid compiler/linker for m_mbr_params_page placement.
+#error Not a valid compiler/linker for m_mbr_params_page placement.
 
 #endif // Compiler specific
 
@@ -101,23 +101,23 @@ NRF_LOG_MODULE_REGISTER();
  */
 #if defined ( __CC_ARM )
 
-    uint32_t const m_uicr_mbr_params_page_address
-        __attribute__((at(NRF_UICR_MBR_PARAMS_PAGE_ADDRESS))) = NRF_MBR_PARAMS_PAGE_ADDRESS;
+uint32_t const m_uicr_mbr_params_page_address
+__attribute__((at(NRF_UICR_MBR_PARAMS_PAGE_ADDRESS))) = NRF_MBR_PARAMS_PAGE_ADDRESS;
 
 #elif defined ( __GNUC__ ) || defined ( __SES_ARM )
 
-    uint32_t const m_uicr_mbr_params_page_address
-        __attribute__ ((section(".uicr_mbr_params_page")))
-        __attribute__ ((used)) = NRF_MBR_PARAMS_PAGE_ADDRESS;
+uint32_t const m_uicr_mbr_params_page_address
+__attribute__ ((section(".uicr_mbr_params_page")))
+__attribute__ ((used)) = NRF_MBR_PARAMS_PAGE_ADDRESS;
 
 #elif defined ( __ICCARM__ )
 
-    __root uint32_t const m_uicr_mbr_params_page_address
-        @ NRF_UICR_MBR_PARAMS_PAGE_ADDRESS = NRF_MBR_PARAMS_PAGE_ADDRESS;
+__root uint32_t const m_uicr_mbr_params_page_address
+@ NRF_UICR_MBR_PARAMS_PAGE_ADDRESS = NRF_MBR_PARAMS_PAGE_ADDRESS;
 
 #else
 
-    #error Not a valid compiler/linker for m_mbr_params_page placement.
+#error Not a valid compiler/linker for m_mbr_params_page placement.
 
 #endif // Compiler specific
 #endif // #if defined( NRF52_SERIES )
@@ -126,9 +126,10 @@ extern char GSM_RSP[1600];
 uint16_t eraser_flag = 0;
 static uint8_t m_fw_veision = 0;
 static uint8_t m_hw_version = 0;
-GSM_RECIEVE_TYPE g_type = GSM_TYPE_CHAR;
+GSM_RECEIVE_TYPE g_type = GSM_TYPE_CHAR;
 nrf_dfu_settings_t s_dfu_settings;
-unsigned char dfu_cc_packet[136]={
+unsigned char dfu_cc_packet[136]=
+{
     0x12,0x84,0x01,0x0A,0x3E,0x08,0x01,0x12,0x3A,0x08,0x01,0x10,0x33,0x1A,0x02,0xA8,
     0x01,0x20,0x00,0x28,0x00,0x30,0x00,0x38,0xA4,0xA6,0x03,0x42,0x24,0x08,0x03,0x12,
     0x20,0x47,0x85,0x28,0x86,0x4D,0xB8,0x4E,0xA7,0x6D,0xE4,0x70,0x2A,0x80,0xE9,0x97,
@@ -140,10 +141,10 @@ unsigned char dfu_cc_packet[136]={
     0x15,0x09,0x51,0x1E,0xAA,0x40,0x75,0x00,
 };
 
-unsigned char m_hash[32] = 
+unsigned char m_hash[32] =
 {
     0x47,0x85,0x28,0x86,0x4D,0xB8,0x4E,0xA7,0x6D,0xE4,0x70,0x2A,0x80,0xE9,0x97,0xD3,
-	  0x02,0xC2,0xBA,0x91,0xCB,0x7D,0xB5,0x27,0x39,0xEE,0xBF,0xFE,0x71,0x12,0x52,0x5F,
+    0x02,0xC2,0xBA,0x91,0xCB,0x7D,0xB5,0x27,0x39,0xEE,0xBF,0xFE,0x71,0x12,0x52,0x5F,
 };
 
 pb_istream_t stream;
@@ -174,30 +175,30 @@ nrf_crypto_hash_sha256_digest_t              m_init_packet_hash;
 extern uint16_t eraser_flag;
 
 uint32_t firmware_copy(uint32_t dst_addr,
-                           uint8_t *src_addr,
-                           uint32_t size)
+                       uint8_t *src_addr,
+                       uint32_t size)
 {
-   	uint32_t ret_val = NRF_SUCCESS;
+    uint32_t ret_val = NRF_SUCCESS;
     if (src_addr == NULL || dst_addr == 0)
     {
         NRF_LOG_DEBUG("No copy needed src_addr: 0x%x, dst_addr: 0x%x", src_addr, dst_addr);
         return NRF_SUCCESS;
     }
 
-		int page = 30; //	1 page = 4096 bytes total 30 page
-		uint32_t str = 0x0004B800;
-		//we remain about 120k for bank1 start from 0x0004B800,you can change size below
+    int page = 30; //	1 page = 4096 bytes total 30 page
+    uint32_t str = 0x0004B800;
+    //we remain about 120k for bank1 start from 0x0004B800,you can change size below
     //first eraser 120k once
-		while(page-- && eraser_flag == 0)
-		{
-		   nrf_nvmc_page_erase(str);
-			 str+=0x1000;
-			 delay_ms(100);
-		}
-		eraser_flag = 1;
-		//second write to flash
+    while(page-- && eraser_flag == 0)
+    {
+        nrf_nvmc_page_erase(str);
+        str+=0x1000;
+        delay_ms(100);
+    }
+    eraser_flag = 1;
+    //second write to flash
     nrf_nvmc_write_bytes(dst_addr,src_addr,size);
-		delay_ms(10);
+    delay_ms(10);
     return ret_val;
 }
 
@@ -222,22 +223,22 @@ void generate_pb(void)
 nrf_dfu_result_t signature_check(void)
 {
     ret_code_t err_code;
-	  uint8_t *ptr = 0;
-	  uint8_t len2 = 0;
+    uint8_t *ptr = 0;
+    uint8_t len2 = 0;
     size_t     hash_len = NRF_CRYPTO_HASH_SIZE_SHA256;
-    
+
     NRF_LOG_INFO("Signature required. Checking signature.");
-	
-	  ptr = (uint8_t *)(&(packet.signed_command.command));
-	  len2 = sizeof(packet.signed_command.command);
-	  DPRINTF(LOG_INFO,"ptr = %X , len2 = %d \r\n", ptr,len2);
+
+    ptr = (uint8_t *)(&(packet.signed_command.command));
+    len2 = sizeof(packet.signed_command.command);
+    DPRINTF(LOG_INFO,"ptr = %X , len2 = %d \r\n", ptr,len2);
     err_code = nrf_crypto_hash_calculate(&m_hash_context,
                                          &g_nrf_crypto_hash_sha256_info,
                                          ptr,
                                          len2,
                                          m_init_packet_hash,
                                          &hash_len);
-	
+
     if (err_code != NRF_SUCCESS)
     {
         return NRF_DFU_RES_CODE_OPERATION_FAILED;
@@ -245,7 +246,7 @@ nrf_dfu_result_t signature_check(void)
 
     // calculate the signature
     NRF_LOG_INFO("Verify signature");
-		//memcpy(&m_init_packet_hash,m_hash,32);
+    //memcpy(&m_init_packet_hash,m_hash,32);
     err_code = nrf_crypto_ecdsa_verify(&m_verify_context,
                                        &m_public_key,
                                        m_init_packet_hash,
@@ -273,19 +274,19 @@ nrf_dfu_result_t signature_check(void)
 void dfu_settings_init(void)
 {
     memset(&s_dfu_settings, 0x00, sizeof(nrf_dfu_settings_t));
-	  // Copy the DFU settings out of flash and into a buffer in RAM.
+    // Copy the DFU settings out of flash and into a buffer in RAM.
     memcpy((void*)&s_dfu_settings, m_dfu_settings_buffer, sizeof(nrf_dfu_settings_t));
-	  s_dfu_settings.settings_version = 0x01;
-	  s_dfu_settings.bootloader_version = 0x01;
-	  s_dfu_settings.app_version = 0x01;
-	  s_dfu_settings.bank_layout = 0;
-	  s_dfu_settings.bank_1.image_size = 120*1024;
-	  s_dfu_settings.progress.update_start_address = 0x0004B800;
-	  s_dfu_settings.write_offset = 0;
-	  // crypto init
-	  nrf_crypto_init();
+    s_dfu_settings.settings_version = 0x01;
+    s_dfu_settings.bootloader_version = 0x01;
+    s_dfu_settings.app_version = 0x01;
+    s_dfu_settings.bank_layout = 0;
+    s_dfu_settings.bank_1.image_size = 120*1024;
+    s_dfu_settings.progress.update_start_address = 0x0004B800;
+    s_dfu_settings.write_offset = 0;
+    // crypto init
+    nrf_crypto_init();
     nrf_crypto_ecc_public_key_from_raw(&g_nrf_crypto_ecc_secp256r1_curve_info, &m_public_key, pk, sizeof(pk));
-} 
+}
 
 void check_answer()
 {
@@ -320,9 +321,9 @@ void dfu_task(void * pvParameter)
         {
             DPRINTF(LOG_INFO, "update begin and stop other task\r\n");
             ret_code_t ret;
-					  /********************************************************************
-					    if enter dfu , stop other Tasks here to make sure update successful
-					  *********************************************************************/
+            /********************************************************************
+              if enter dfu , stop other Tasks here to make sure update successful
+            *********************************************************************/
             ret = nrf_sdh_disable_request();
             delay_ms(2000);
             DPRINTF(LOG_INFO, "ret = %d\r\n", ret);

@@ -66,22 +66,23 @@
 uint32_t opt3001_twi_init(void)
 {
     uint32_t err_code;
-    
-    const nrf_drv_twi_config_t twi_config = {
-       .scl                = OPT3001_TWI_SCL_PIN,
-       .sda                = OPT3001_TWI_SDA_PIN,
-       .frequency          = NRF_TWI_FREQ_400K,
-       .interrupt_priority = APP_IRQ_PRIORITY_HIGHEST
+
+    const nrf_drv_twi_config_t twi_config =
+    {
+        .scl                = OPT3001_TWI_SCL_PIN,
+        .sda                = OPT3001_TWI_SDA_PIN,
+        .frequency          = NRF_TWI_FREQ_400K,
+        .interrupt_priority = APP_IRQ_PRIORITY_HIGHEST
     };
-		
+
     rak_i2c_deinit();
     err_code = rak_i2c_init(&twi_config);
     if(err_code != NRF_SUCCESS)
-	  {
-		    return err_code;
-	  }
-	
-	  return NRF_SUCCESS;
+    {
+        return err_code;
+    }
+
+    return NRF_SUCCESS;
 }
 
 /**************************************************************************************************
@@ -98,14 +99,14 @@ uint32_t opt3001_twi_init(void)
  **************************************************************************************************/
 bool sensorReadReg(uint8_t addr, uint8_t *pBuf, uint8_t nBytes)
 {
-	if(rak_i2c_read(OPT3001_ADDR, addr,pBuf,nBytes) == NRF_SUCCESS)
-	{
-			return true;
-	}
-  else 
-	{
-			return false;
-	}
+    if(rak_i2c_read(OPT3001_ADDR, addr,pBuf,nBytes) == NRF_SUCCESS)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 /**************************************************************************************************
@@ -121,54 +122,54 @@ bool sensorReadReg(uint8_t addr, uint8_t *pBuf, uint8_t nBytes)
 */
 bool sensorWriteReg(uint8_t addr, uint8_t *pBuf, uint8_t nBytes)
 {
-	if(rak_i2c_write(OPT3001_ADDR, addr, pBuf, nBytes) == NRF_SUCCESS)
-	{
-			return true;
-	}
-	else 
-	{
-			return false;
-	}
+    if(rak_i2c_write(OPT3001_ADDR, addr, pBuf, nBytes) == NRF_SUCCESS)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 int opt3001_init(void)
 {
     int ret;
-		uint16_t manufacture_id=0, device_id=0;
-	
-		sensorOpt3001Enable(1);
+    uint16_t manufacture_id=0, device_id=0;
 
-		ret = opt3001_get_id(&manufacture_id, &device_id);
-		if(ret)
-		{
-				DPRINTF(LOG_INFO, "opt3001:manufacture_id=%x device_id=%x\r\n", manufacture_id, device_id);
-		}
-		else 
-		{
-				return -1;
-		}
-		return 0;
+    sensorOpt3001Enable(1);
+
+    ret = opt3001_get_id(&manufacture_id, &device_id);
+    if(ret)
+    {
+        DPRINTF(LOG_INFO, "opt3001:manufacture_id=%x device_id=%x\r\n", manufacture_id, device_id);
+    }
+    else
+    {
+        return -1;
+    }
+    return 0;
 }
 
 int get_opt3001_data(float *light_data)
 {
-		int ret;
-		int count =1;
-		uint16_t light_raw_data=0;
-		//float light_data=0;
-		while(count--)
-		{
-			ret = sensorOpt3001Read(&light_raw_data);
-			//DPRINTF(LOG_INFO, "light=%d %d\r\n", light_raw_data, ret);
-			*light_data = sensorOpt3001Convert(light_raw_data);
-			//nrf_delay_ms(1000);
-			//vTaskDelay(100);
-		}
+    int ret;
+    int count =1;
+    uint16_t light_raw_data=0;
+    //float light_data=0;
+    while(count--)
+    {
+        ret = sensorOpt3001Read(&light_raw_data);
+        //DPRINTF(LOG_INFO, "light=%d %d\r\n", light_raw_data, ret);
+        *light_data = sensorOpt3001Convert(light_raw_data);
+        //nrf_delay_ms(1000);
+        //vTaskDelay(100);
+    }
 }
 
 void opt3001_deinit()
 {
-		rak_i2c_deinit();
+    rak_i2c_deinit();
 }
 
 /* Register addresses */
@@ -183,7 +184,7 @@ void opt3001_deinit()
 /* Register values */
 #define MANUFACTURER_ID                 0x5449  // TI
 #define DEVICE_ID                       0x3001  // Opt 3001
-#define CONFIG_RESET                    0xC810                   
+#define CONFIG_RESET                    0xC810
 #define CONFIG_TEST                     0xCC10
 #define CONFIG_ENABLE                   0x10CC // 0xCC10                  
 #define CONFIG_DISABLE                  0x108C // 0xC810
@@ -221,7 +222,7 @@ void opt3001_deinit()
  ******************************************************************************/
 void sensorOpt3001Init(void)
 {
-  sensorOpt3001Enable(false);
+    sensorOpt3001Enable(false);
 }
 
 
@@ -234,14 +235,14 @@ void sensorOpt3001Init(void)
  ******************************************************************************/
 void sensorOpt3001Enable(uint8_t enable)
 {
-  uint16_t val;
-  
-  if (enable)
-    val = CONFIG_ENABLE;
-  else
-    val = CONFIG_DISABLE;
-  
-  sensorWriteReg(REG_CONFIGURATION, (uint8_t *)&val, REGISTER_LENGTH);
+    uint16_t val;
+
+    if (enable)
+        val = CONFIG_ENABLE;
+    else
+        val = CONFIG_DISABLE;
+
+    sensorWriteReg(REG_CONFIGURATION, (uint8_t *)&val, REGISTER_LENGTH);
 }
 
 
@@ -256,28 +257,28 @@ void sensorOpt3001Enable(uint8_t enable)
  ******************************************************************************/
 int sensorOpt3001Read(uint16_t *rawData)
 {
-  int success;
-  uint16_t val;
-  
-  success = sensorReadReg(REG_CONFIGURATION, (uint8_t *)&val, REGISTER_LENGTH);
+    int success;
+    uint16_t val;
 
-  if (success)
-    success = (val & DATA_RDY_BIT) == DATA_RDY_BIT;
+    success = sensorReadReg(REG_CONFIGURATION, (uint8_t *)&val, REGISTER_LENGTH);
 
-  if (success)
-    success = sensorReadReg(REG_RESULT, (uint8_t*)&val, DATA_LENGTH);
-  
-  if (success)
-  {
-    // Swap bytes
-    *rawData = (val << 8) | (val>>8 &0xFF);
-  } 
-  else
-  {
+    if (success)
+        success = (val & DATA_RDY_BIT) == DATA_RDY_BIT;
+
+    if (success)
+        success = sensorReadReg(REG_RESULT, (uint8_t*)&val, DATA_LENGTH);
+
+    if (success)
+    {
+        // Swap bytes
+        *rawData = (val << 8) | (val>>8 &0xFF);
+    }
+    else
+    {
 //    sensorSetErrorData((uint8_t*)rawData, DATA_LENGTH);
-  }
-  
-  return success;
+    }
+
+    return success;
 }
 
 
@@ -291,84 +292,84 @@ int sensorOpt3001Read(uint16_t *rawData)
 
 int sensorOpt3001Test(void)
 {
-  uint16_t val;
-	int success;
+    uint16_t val;
+    int success;
 
-  // Check manufacturer ID
-  success = sensorReadReg(REG_MANUFACTURER_ID, (uint8_t *)&val, REGISTER_LENGTH);
-	if(success)
-	{
-			val = (LO_UINT16(val) << 8) | HI_UINT16(val);
-			if(val != MANUFACTURER_ID)
-			{
-					return false;
-			}
-	}
-	else 
-	{
-			return false;
-	}
-  // Check device ID
-	success = sensorReadReg(REG_DEVICE_ID, (uint8_t *)&val, REGISTER_LENGTH);
-	if(success)
-	{
-			val = (LO_UINT16(val) << 8) | HI_UINT16(val);
-			if(val != DEVICE_ID)
-			{
-					return false;
-			}				
-	}
-	else 
-	{
-			return false;
-	}
-	
-  return success;
+    // Check manufacturer ID
+    success = sensorReadReg(REG_MANUFACTURER_ID, (uint8_t *)&val, REGISTER_LENGTH);
+    if(success)
+    {
+        val = (LO_UINT16(val) << 8) | HI_UINT16(val);
+        if(val != MANUFACTURER_ID)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+    // Check device ID
+    success = sensorReadReg(REG_DEVICE_ID, (uint8_t *)&val, REGISTER_LENGTH);
+    if(success)
+    {
+        val = (LO_UINT16(val) << 8) | HI_UINT16(val);
+        if(val != DEVICE_ID)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+
+    return success;
 }
 
 int opt3001_get_id(uint16_t *manufacture_id, uint16_t *device_id)
 {
-  uint16_t val;
-	int success;
+    uint16_t val;
+    int success;
 
-  // Check manufacturer ID
-  success = sensorReadReg(REG_MANUFACTURER_ID, (uint8_t *)&val, REGISTER_LENGTH);
-	if(success)
-	{
-			val = (LO_UINT16(val) << 8) | HI_UINT16(val);
-			if(val != MANUFACTURER_ID)
-			{
-					return false;
-			}
-			else 
-			{
-					*manufacture_id = val;
-			}
-	}
-	else 
-	{
-			return false;
-	}
-  // Check device ID
-	success = sensorReadReg(REG_DEVICE_ID, (uint8_t *)&val, REGISTER_LENGTH);
-	if(success)
-	{
-			val = (LO_UINT16(val) << 8) | HI_UINT16(val);
-			if(val != DEVICE_ID)
-			{
-					return false;
-			}		
-			else 
-			{
-					*device_id = val;
-			}			
-	}
-	else 
-	{
-			return false;
-	}
-	
-  return success;
+    // Check manufacturer ID
+    success = sensorReadReg(REG_MANUFACTURER_ID, (uint8_t *)&val, REGISTER_LENGTH);
+    if(success)
+    {
+        val = (LO_UINT16(val) << 8) | HI_UINT16(val);
+        if(val != MANUFACTURER_ID)
+        {
+            return false;
+        }
+        else
+        {
+            *manufacture_id = val;
+        }
+    }
+    else
+    {
+        return false;
+    }
+    // Check device ID
+    success = sensorReadReg(REG_DEVICE_ID, (uint8_t *)&val, REGISTER_LENGTH);
+    if(success)
+    {
+        val = (LO_UINT16(val) << 8) | HI_UINT16(val);
+        if(val != DEVICE_ID)
+        {
+            return false;
+        }
+        else
+        {
+            *device_id = val;
+        }
+    }
+    else
+    {
+        return false;
+    }
+
+    return success;
 }
 
 /*******************************************************************************
@@ -384,12 +385,12 @@ int opt3001_get_id(uint16_t *manufacture_id, uint16_t *device_id)
  ******************************************************************************/
 float sensorOpt3001Convert(uint16_t rawData)
 {
-  uint16_t e, m;
+    uint16_t e, m;
 
-  m = rawData & 0x0FFF;
-  e = (rawData & 0xF000) >> 12;
-  
-  return m * (0.01 * exp2(e));
+    m = rawData & 0x0FFF;
+    e = (rawData & 0xF000) >> 12;
+
+    return m * (0.01 * exp2(e));
 }
 
 /*******************************************************************************
