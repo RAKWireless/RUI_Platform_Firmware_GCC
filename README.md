@@ -1,5 +1,13 @@
 ***************************************************************************************************************************************
 
+Update log 2019.1.18
+  
+1. support nRF52840 and use s140 hex in ..\RUI\build\hex when compiling 
+2. put RUI in each sdk, nRF52832 is corresponding to nRF5_SDK_15.0.0_a53641a and nRF52840 is corresponding to nRF5_SDK_15.2.0_9412b96
+3. optimize compile GUI
+  
+***************************************************************************************************************************************
+
 Update log 2019.1.2
   
   Solve the bug of ble connection with nRF connect. However, it should be cautious about the size of task and priority of user's task 
