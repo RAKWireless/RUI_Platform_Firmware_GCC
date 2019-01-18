@@ -51,17 +51,17 @@ SECTIONS
     KEEP(*(SORT(.sdh_soc_observers*)))
     PROVIDE(__stop_sdh_soc_observers = .);
   } > FLASH
-  .sdh_ble_observers :
-  {
-    PROVIDE(__start_sdh_ble_observers = .);
-    KEEP(*(SORT(.sdh_ble_observers*)))
-    PROVIDE(__stop_sdh_ble_observers = .);
-  } > FLASH
   .pwr_mgmt_data :
   {
     PROVIDE(__start_pwr_mgmt_data = .);
     KEEP(*(SORT(.pwr_mgmt_data*)))
     PROVIDE(__stop_pwr_mgmt_data = .);
+  } > FLASH
+  .sdh_ble_observers :
+  {
+    PROVIDE(__start_sdh_ble_observers = .);
+    KEEP(*(SORT(.sdh_ble_observers*)))
+    PROVIDE(__stop_sdh_ble_observers = .);
   } > FLASH
   .log_const_data :
   {

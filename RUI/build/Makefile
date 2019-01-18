@@ -1,17 +1,62 @@
+#numbers of supported mcu is from 1 to 9
+#numbers of supported connectivity chips is from 1-9,a-z,A-Z, at most 61
+#numbers of supported sensors is from 1-9,a-z,A-Z, at most 61
 PROJECT_NAME     := RUI
-TARGETS          := nrf52832_xxaa
+TARGETS          := nrf52_xxaa
 OUTPUT_DIRECTORY := _build
-P := 0
+P :=
+NUM := $(words $(P))
 SDK_ROOT := ../..
 
-$(OUTPUT_DIRECTORY)/nrf52832_xxaa.out: \
-  LINKER_SCRIPT  := rui_gcc_nrf52.ld
-
+ifeq (1, $(word 1, $(P)))
+$(OUTPUT_DIRECTORY)/nrf52_xxaa.out: \
+  LINKER_SCRIPT  := rui_gcc_nrf52832.ld
+else ifeq (2, $(word 1, $(P)))
+$(OUTPUT_DIRECTORY)/nrf52_xxaa.out: \
+  LINKER_SCRIPT  := rui_gcc_nrf52840.ld
+endif
 # Source files common to all targets
+
+ifeq (2, $(word 1, $(P)))
+  SRC_FILES += $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c
+  SRC_FILES += $(SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52840.S
+  SRC_FILES += $(SDK_ROOT)/components/libraries/log/src/nrf_log_frontend.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_rtt.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_uart.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_serial.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/log/src/nrf_log_str_formatter.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/log/src/nrf_log_default_backends.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/memobj/nrf_memobj.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/ringbuf/nrf_ringbuf.c
+endif
+ifeq (1, $(word 1, $(P)))
+  SRC_FILES += $(SDK_ROOT)/RUI/build/RTE/Device/nRF52832_xxAA/system_nrf52.c
+  SRC_FILES += $(SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52.S
+  SRC_FILES += $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_frontend.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_rtt.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_uart.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_serial.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_str_formatter.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_default_backends.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/experimental_memobj/nrf_memobj.c
+  SRC_FILES += $(SDK_ROOT)/components/ble/peer_manager/pm_mutex.c
+endif
+
 SRC_FILES += \
-  $(SDK_ROOT)/RUI/build/RTE/Device/nRF52832_xxAA/system_nrf52.c \
-  $(SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52.S \
-  $(SDK_ROOT)/RUI/Source/service/sensor/sensor.c \
+  $(SDK_ROOT)/RUI/Source/main.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uart.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_clock.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_twim.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spim.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
+  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_clock.c \
+  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_power.c \
+  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_spi.c \
+  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_swi.c \
+  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_twi.c \
+  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_uart.c \
   $(SDK_ROOT)/external/freertos/portable/GCC/nrf52/port.c \
   $(SDK_ROOT)/external/freertos/source/tasks.c \
   $(SDK_ROOT)/external/freertos/source/croutine.c \
@@ -26,14 +71,6 @@ SRC_FILES += \
   $(SDK_ROOT)/external/fprintf/nrf_fprintf.c \
   $(SDK_ROOT)/external/fprintf/nrf_fprintf_format.c \
   $(SDK_ROOT)/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c \
-  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uart.c \
-  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
-  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_clock.c \
-  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_twim.c \
-  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \
-  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spim.c \
-  $(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
-  $(SDK_ROOT)/components/ble/peer_manager/pm_mutex.c \
   $(SDK_ROOT)/components/ble/peer_manager/peer_id.c \
   $(SDK_ROOT)/components/ble/peer_manager/pm_buffer.c \
   $(SDK_ROOT)/components/ble/peer_manager/security_dispatcher.c \
@@ -45,12 +82,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/ble/peer_manager/id_manager.c \
   $(SDK_ROOT)/components/ble/peer_manager/peer_manager.c \
   $(SDK_ROOT)/components/ble/common/ble_srv_common.c \
-  $(SDK_ROOT)/RUI/Source/main.c \
-  $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_frontend.c \
-  $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_rtt.c \
-  $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_uart.c \
-  $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_serial.c \
-  $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_str_formatter.c \
+  $(SDK_ROOT)/RUI/Source/service/sensor/sensor.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
   $(SDK_ROOT)/components/libraries/experimental_section_vars/nrf_section_iter.c \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
@@ -63,7 +95,6 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/fstorage/nrf_fstorage.c \
   $(SDK_ROOT)/components/libraries/atomic/nrf_atomic.c \
   $(SDK_ROOT)/components/libraries/atomic_flags/nrf_atflags.c \
-  $(SDK_ROOT)/components/libraries/experimental_memobj/nrf_memobj.c \
   $(SDK_ROOT)/components/libraries/atomic_fifo/nrf_atfifo.c \
   $(SDK_ROOT)/components/libraries/bsp/bsp.c \
   $(SDK_ROOT)/components/boards/boards.c \
@@ -75,13 +106,6 @@ SRC_FILES += \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_ble.c \
   $(SDK_ROOT)/components/ble/common/ble_conn_params.c \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus/ble_nus.c \
-  $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_default_backends.c \
-  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_clock.c \
-  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_power.c \
-  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_spi.c \
-  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_swi.c \
-  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_twi.c \
-  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_uart.c \
   $(SDK_ROOT)/modules/nrfx/hal/nrf_nvmc.c \
   $(SDK_ROOT)/components/libraries/bsp/bsp_btn_ble.c \
   $(SDK_ROOT)/components/libraries/fds/fds.c \
@@ -107,40 +131,55 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/util/nrf_assert.c \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
 
-ifeq (a, $(findstring a, $(P)))
+
+
+ifeq (1, $(word 2, $(P)))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/bc95-g.c
-endif
-ifeq (b, $(findstring b, $(P)))
+else ifeq (2, $(word 2, $(P)))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/bg96.c
-endif
-ifeq (c, $(findstring c, $(P)))
+else ifeq (3, $(word 2, $(P)))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/m35.c
 endif
-ifeq (d, $(findstring d, $(P)))
+
+ifeq (1, $(findstring 1, $(wordlist 3, $(NUM), $(P))))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/bme280.c
 endif
-ifeq (e, $(findstring e, $(P)))
+ifeq (2, $(findstring 2, $(wordlist 3, $(NUM), $(P))))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/l70_gps.c
 endif
-ifeq (f, $(findstring f, $(P)))
+ifeq (3, $(findstring 3, $(wordlist 3, $(NUM), $(P))))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/lis2mdl.c
 endif
-ifeq (g, $(findstring g, $(P)))
+ifeq (4, $(findstring 4, $(wordlist 3, $(NUM), $(P))))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/lis3dh.c
 endif
-ifeq (h, $(findstring h, $(P)))
+ifeq (5, $(findstring 5, $(wordlist 3, $(NUM), $(P))))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/opt3001.c
 endif
 # Include folders common to all targets
+
+ifeq (2, $(word 1, $(P)))
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/log
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/ringbuf  
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/log/src
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/memobj
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/mutex  
+  INC_FOLDERS += $(SDK_ROOT)/components/softdevice/s140/headers
+  INC_FOLDERS += $(SDK_ROOT)/components/softdevice/s140/headers/nRF52
+else ifeq (1, $(word 1, $(P)))
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/experimental_log
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/experimental_log/src
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/experimental_memobj
+  INC_FOLDERS += $(SDK_ROOT)/components/softdevice/s132/headers
+  INC_FOLDERS += $(SDK_ROOT)/components/softdevice/s132/headers/nRF52
+endif
+
 INC_FOLDERS += \
   $(SDK_ROOT)/components \
-  $(SDK_ROOT)/components/libraries/experimental_memobj \
+  $(SDK_ROOT)/integration/nrfx/legacy \
   $(SDK_ROOT)/components/libraries/experimental_section_vars \
-  $(SDK_ROOT)/components/softdevice/s132/headers \
-  $(SDK_ROOT)/components/softdevice/s132/headers/nrf52 \
   $(SDK_ROOT)/components/libraries/strerror \
   $(SDK_ROOT)/components/libraries/fstorage \
-  $(SDK_ROOT)/components/libraries/experimental_memobj \
   $(SDK_ROOT)/components/softdevice/common \
   $(SDK_ROOT)/components/libraries/util/ \
   $(SDK_ROOT)/components/ble/ble_link_ctx_manager \
@@ -150,8 +189,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/balloc \
   $(SDK_ROOT)/components/boards \
   $(SDK_ROOT)/components/ble/peer_manager \
-  $(SDK_ROOT)/integration/nrfx/legacy \
-  $(SDK_ROOT)/components/libraries/experimental_log \
   $(SDK_ROOT)/components/softdevice/common \
   $(SDK_ROOT)/components/ble/common \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus \
@@ -183,8 +220,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/modules/nrfx/hal \
   $(SDK_ROOT)/modules/nrfx/drivers/src/prs \
   $(SDK_ROOT)/components/libraries/balloc \
-  $(SDK_ROOT)/components/libraries/experimental_log \
-  $(SDK_ROOT)/components/libraries/experimental_log/src \
   $(SDK_ROOT)/components/libraries/delay \
   $(SDK_ROOT)/integration/nrfx \
   $(SDK_ROOT)/components/libraries/bsp \
@@ -203,7 +238,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/external/freertos/source/include \
   $(SDK_ROOT)/external/fprintf \
   $(SDK_ROOT)/external/segger_rtt \
-  $(SDK_ROOT)/integration/nrfx/legacy \
   $(SDK_ROOT)/modules/nrfx/drivers/include \
   $(SDK_ROOT)/components/libraries/util \
   $(SDK_ROOT)/components/ble/ble_advertising \
@@ -212,6 +246,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/bsp \
   $(SDK_ROOT)/modules/nrfx/drivers/include \
   $(SDK_ROOT)/modules/nrfx/hal/ \
+  
 # Libraries common to all targets
 LIB_FILES += $(SDK_ROOT)/RUI/Source/external/micro-ecc/micro_ecc_lib_nrf52.lib
 
@@ -221,41 +256,53 @@ OPT = -O3 -g3
 #OPT += -flto
 
 # C flags common to all targets
-ifeq (a, $(findstring a, $(P)))
+ifeq (1, $(word 2, $(P)))
   CFLAGS += -DBC95G_TEST
 endif
-ifeq (b, $(findstring b, $(P)))
+ifeq (2, $(word 2, $(P)))
   CFLAGS += -DBG96_TEST
 endif
-ifeq (c, $(findstring c, $(P)))
+ifeq (3, $(word 2, $(P)))
   CFLAGS += -DM35_TEST
 endif
-ifeq (d, $(findstring d, $(P)))
+
+ifeq (1, $(findstring 1, $(wordlist 3, $(NUM), $(P))))
   CFLAGS += -DBEM280_TEST
 endif
-ifeq (e, $(findstring e, $(P)))
+ifeq (2, $(findstring 2, $(wordlist 3, $(NUM), $(P))))
   CFLAGS += -DL70R_TEST
 endif
-ifeq (f, $(findstring f, $(P)))
+ifeq (3, $(findstring 3, $(wordlist 3, $(NUM), $(P))))
   CFLAGS += -DLIS2MDL_TEST
 endif
-ifeq (g, $(findstring g, $(P)))
+ifeq (4, $(findstring 4, $(wordlist 3, $(NUM), $(P))))
   CFLAGS += -DLIS3DH_TEST
 endif
-ifeq (h, $(findstring h, $(P)))
+ifeq (5, $(findstring 5, $(wordlist 3, $(NUM), $(P))))
   CFLAGS += -DOPT3001_TEST
 endif
+
 CFLAGS += $(OPT)
-CFLAGS += -DBOARD_PCA10040
-CFLAGS += -DDEBUG
-CFLAGS += -DCONFIG_NFCT_PINS_AS_GPIOS
+ifeq (2, $(word 1, $(P)))
+  CFLAGS += -DBOARD_PCA10056
+  CFLAGS += -DS140
+  CFLAGS += -DCONFIG_GPIO_AS_PINRESET
+  CFLAGS += -DFLOAT_ABI_HARD
+  CFLAGS += -DNRF52840_XXAA
+  CFLAGS += -DNRF_SD_BLE_API_VERSION=6
+else ifeq (1, $(word 1, $(P)))
+   CFLAGS += -DBOARD_PCA10040
+   CFLAGS += -DNRF_SD_BLE_API_VERSION=5 
+   CFLAGS += -DNRF52832_XXAA
+   CFLAGS += -DNRF52_PAN_74
+   CFLAGS += -DNRF52
+   CFLAGS += -DDEBUG
+   CFLAGS += -DCONFIG_NFCT_PINS_AS_GPIOS
+endif
+
+
 CFLAGS += -DSOFTDEVICE_PRESENT
-CFLAGS += -DNRF52
-CFLAGS += -DS132 
 CFLAGS += -DSWI_DISABLE0
-CFLAGS += -DNRF_SD_BLE_API_VERSION=5 
-CFLAGS += -DNRF52832_XXAA
-CFLAGS += -DNRF52_PAN_74
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall
@@ -272,16 +319,24 @@ ASMFLAGS += -g3
 ASMFLAGS += -mcpu=cortex-m4
 ASMFLAGS += -mthumb -mabi=aapcs
 ASMFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
-ASMFLAGS += -DBOARD_PCA10040
-ASMFLAGS += -DBSP_DEFINES_ONLY
 ASMFLAGS += -DCONFIG_GPIO_AS_PINRESET
 ASMFLAGS += -DFLOAT_ABI_HARD
-ASMFLAGS += -DNRF52
-ASMFLAGS += -DNRF52832_XXAA
-ASMFLAGS += -DNRF52_PAN_74
-ASMFLAGS += -DSOFTDEVICE_PRESENT
-ASMFLAGS += -DS132
-ASMFLAGS += -DNRF_SD_BLE_API_VERSION=5 
+
+ifeq (2, $(word 1, $(P)))
+  ASMFLAGS += -DBOARD_PCA10056
+  ASMFLAGS += -DNRF52840_XXAA
+  ASMFLAGS += -DNRF_SD_BLE_API_VERSION=6
+  ASMFLAGS += -DS140
+  ASMFLAGS += -DSOFTDEVICE_PRESENT
+  ASMFLAGS += -DSWI_DISABLE0
+else ifeq (1, $(word 1, $(P)))
+  ASMFLAGS += -DBOARD_PCA10040
+  ASMFLAGS += -DBSP_DEFINES_ONLY
+  ASMFLAGS += -DNRF52
+  ASMFLAGS += -DNRF52832_XXAA
+  ASMFLAGS += -DNRF52_PAN_74
+endif
+
 # Linker flags
 LDFLAGS += $(OPT)
 LDFLAGS += -mthumb -mabi=aapcs -L$(SDK_ROOT)/modules/nrfx/mdk -T$(LINKER_SCRIPT)
@@ -292,10 +347,10 @@ LDFLAGS += -Wl,--gc-sections
 # use newlib in nano version
 LDFLAGS += --specs=nano.specs
 
-nrf52832_xxaa: CFLAGS += -D__HEAP_SIZE=8192
-nrf52832_xxaa: CFLAGS += -D__STACK_SIZE=8192
-nrf52832_xxaa: ASMFLAGS += -D__HEAP_SIZE=8192
-nrf52832_xxaa: ASMFLAGS += -D__STACK_SIZE=8192
+nrf52_xxaa: CFLAGS += -D__HEAP_SIZE=8192
+nrf52_xxaa: CFLAGS += -D__STACK_SIZE=8192
+nrf52_xxaa: ASMFLAGS += -D__HEAP_SIZE=8192
+nrf52_xxaa: ASMFLAGS += -D__STACK_SIZE=8192
 
 # Add standard libraries at the very end of the linker input, after all objects
 # that may need symbols provided by these libraries.
@@ -305,8 +360,8 @@ LIB_FILES += -lc -lnosys -lm
 .PHONY: default help
 
 # Default target - first one defined
-default: nrf52832_xxaa
-#color "\033[41;37m TonyZhang \033[0m"
+default: nrf52_xxaa
+
 # Print all targets that can be built
 help:
 	@echo	-e	\
@@ -335,22 +390,19 @@ help:
 *   ../RUI/build/ and choose chip and sensor supplied below            *\n  \
 *                                                                      *\n  \
 *  \033[36mComputing\033[0m      * \033[35mConnectivity\033[0m    * \033[33mSensor\033[0m                           *\n  \
-*                                                                      *\n  \
-*  \033[36m1. nRF52832\033[0m    * \033[35ma. bc95-g\033[0m       * \033[33md. bme280   e. L_70_R\033[0m            *\n  \
-*  \033[36m2. nRF52840\033[0m    * \033[35mb. bg96\033[0m         * \033[33mf. lis2mdl  g. lis3dh\033[0m            *\n  \
-*                 * \033[35mc. m35\033[0m          * \033[33mh. opt3001\033[0m                       *\n  \
+*                 *                 *                                  *\n  \
+*  \033[36m1. nRF52832\033[0m    * \033[35m1. bc95-g\033[0m       * \033[33m1. bme280   2. L_70_R\033[0m            *\n  \
+*  \033[36m2. nRF52840\033[0m    * \033[35m2. bg96\033[0m         * \033[33m3. lis2mdl  4. lis3dh\033[0m            *\n  \
+*                 * \033[35m3. m35\033[0m          * \033[33m5. opt3001\033[0m                       *\n  \
 *                                                                      *\n  \
 *  \033[32m3. Compile command  \033[0m                                                *\n  \
 *                                                                      *\n  \
 *  -- \033[31mmake clean\033[0m  -- clean all targets                                 *\n  \
 *                                                                      *\n  \
-*  -- \033[31mmake P=chip+sensor\033[0m like below                                    *\n  \
-*  Rakwirelss board                                                    *\n  \
-*  8212 -- \033[31mmake P=1bdfgh\033[0m              8212_M -- \033[31mmake P=1bg\033[0m             *\n  \
-*  8211_G -- \033[31mmake P=1cdefgh\033[0m           8211_NB -- \033[31mmake P=1adefgh\033[0m        *\n  \
-*  User designed board                                                 *\n  \
-*  choose the corresponding sensor and remeber to change pin number in *\n  \
-*  RUI\Source\include\board_basic.h                                       *\n  \
+*  -- \033[31mmake P=\"1 2 3 5\"\033[0m  -- mcu(1) commu(2) sensor(3 5 ...)             *\n  \
+*  eg Rak_8212 compile cmd \033[31mmake P=\"1 2 1 3 4 5\"\033[0m                        *\n  \
+*  choose the corresponding sensor and remember to change pin number   *\n  \
+*  in RUI\Source\include\board_basic.h                                    *\n  \
 *                                                                      *\n  \
 *  -- \033[31mmake help\033[0m -- show RUI description                                *\n  \
 *                                                                      *\n  \

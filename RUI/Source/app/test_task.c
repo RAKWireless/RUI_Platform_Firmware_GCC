@@ -1,5 +1,4 @@
 #include "board_basic.h"
-#include "nrf52.h"
 #include "boards.h"
 #include "nrf_delay.h"
 #include "nrf_drv_rtc.h"
@@ -62,6 +61,6 @@ void test_task(void * pvParameter)
 
 #endif
         NRF_LOG_INFO("++++++++++++++++test end++++++++++++++++\r\n");
-        vTaskDelay(10000);
+        vTaskDelay(5000);
     }
 }

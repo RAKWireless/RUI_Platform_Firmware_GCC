@@ -1,10 +1,4 @@
 #include "board_basic.h"
-#include "nrf52.h"
-#include "boards.h"
-#include "nrf_delay.h"
-#include "nrf_drv_rtc.h"
-#include "nrf_rtc.h"
-#include "nrf_drv_gpiote.h"
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>

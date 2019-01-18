@@ -1,4 +1,4 @@
-#include "nrf52.h"
+#include "board_basic.h"
 #include "boards.h"
 #include "nrf_delay.h"
 #include "nrf_drv_rtc.h"
