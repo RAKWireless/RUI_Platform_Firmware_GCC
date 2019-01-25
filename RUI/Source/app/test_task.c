@@ -28,6 +28,7 @@ void test_task(void * pvParameter)
     while(1)
     {
         NRF_LOG_INFO("++++++++++++++++test begin++++++++++++++++\r\n");
+        power_save_close();
 #ifdef BEM280_TEST
         itracker_function.temperature_get(&temp);
         NRF_LOG_INFO("temperature = %d\r\n",temp);
@@ -60,7 +61,8 @@ void test_task(void * pvParameter)
         NRF_LOG_INFO("gps info = %s\r\n",gps_rsp);
 
 #endif
+        power_save_open();
         NRF_LOG_INFO("++++++++++++++++test end++++++++++++++++\r\n");
-        vTaskDelay(5000);
+        vTaskDelay(20000);
     }
 }

@@ -556,5 +556,7 @@ void GpioDeinit( Gpio_t *obj );
 void rui_printf(char *pt);
 
 void delay_ms(uint32_t ms);
+void power_save_open();
+void power_save_close();
 
 #endif
