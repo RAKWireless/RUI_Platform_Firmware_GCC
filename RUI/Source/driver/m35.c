@@ -93,18 +93,6 @@ void Gsm_PowerUp(void)
     delay_ms(1000);
 }
 
-void Gsm_PowerDown(void)
-{
-#if 0
-    DPRINTF(LOG_DEBUG, "GMS_PowerDown\r\n");
-    GSM_PWD_LOW;
-    delay_ms(800); //800ms     600ms > t >1000ms
-    GSM_PWD_HIGH;
-    delay_ms(12000); //12s
-    GSM_PWR_EN_DISABLE;
-    delay_ms(2000);
-#endif
-}
 
 int Gsm_RxByte(void)
 {
@@ -196,6 +184,15 @@ int Gsm_WaitRspOK(char *rsp_value, uint16_t timeout_ms, uint8_t is_rf)
     }
 
     return ret;
+}
+
+//The shut off api is emergency cmd. For safe, please use "AT+QPOWD=1" and it will cost less than 60s.
+void Gsm_PowerDown(void)
+{
+    int ret = -1;
+    Gsm_print("AT+QPOWD=0");
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 4, true);
 }
 
 int Gsm_WaitSendAck(uint16_t timeout_ms)

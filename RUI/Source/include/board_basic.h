@@ -6,6 +6,7 @@
 #include "app_error.h"
 #include "nrf_log.h"
 #include "nrf_gpio.h"
+#include "nrf_delay.h"
 #include "app_uart.h"
 #include "utilities.h"
 #include "gps.h"

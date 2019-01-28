@@ -81,6 +81,7 @@ void Gps_Gpio_Init()
 {
     nrf_gpio_cfg_output(GPS_PWR_ON_PIN);
     nrf_gpio_cfg_output(GPS_RESET_PIN);
+    nrf_gpio_cfg_input(GPS_STANDBY_PIN,NRF_GPIO_PIN_PULLUP);    
 }
 
 void Gps_power_up( void )
@@ -98,4 +99,10 @@ void Gps_Init(void)
 {
     Gps_Gpio_Init();
     Gps_power_up();
+}
+
+void Gps_standby(void)
+{
+     nrf_gpio_cfg_output(GPS_STANDBY_PIN);
+     nrf_gpio_pin_write (GPS_STANDBY_PIN, 0);
 }

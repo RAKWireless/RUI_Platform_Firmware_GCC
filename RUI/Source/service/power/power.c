@@ -9,24 +9,30 @@
 #include "nrf_soc.h"
 #include "sensor.h"
 
-
-#ifdef LIS3DH_TEST
-#include "Lis3dh.h"
-#endif
-
 #ifdef BG96_TEST
 #include "bg96.h"
+#endif
+#ifdef BC95G_TEST
+#include "bc95-g.h"
+#endif
+#ifdef M35_TEST
+#include "m35.h"
+#endif
+
+#ifdef L70R_TEST
+extern void Gps_standby(void);
 #endif
 
 void power_save_open()
 {
     NRF_LOG_INFO("power save open!\r\n");
-#ifdef LIS3DH_TEST
-    (void)LIS3DH_SetMode(LIS3DH_POWER_DOWN);
+
+#if defined(BC95G_TEST) || defined(M35_TEST) || defined(BG96_TEST)
+    Gsm_PowerDown();
 #endif
 
-#ifdef BG96_TEST
-    Gsm_PowerDown();
+#ifdef L70R_TEST
+    Gps_standby();
 #endif
 }
 

@@ -187,7 +187,7 @@ int Gsm_WaitRspOK(char *rsp_value, uint16_t timeout_ms, uint8_t is_rf)
     return ret;
 }
 
-
+//The shut off api is emergency cmd. For safe, please use "AT+QPOWD=1" and it will cost less than 60s.
 void Gsm_PowerDown(void)
 {
     int ret = -1;
