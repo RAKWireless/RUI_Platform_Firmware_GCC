@@ -182,8 +182,8 @@ void vApplicationIdleHook( void )
 {
     while(1)
     {
-        //DPRINTF(LOG_DEBUG,"idle task\r\n");
-        //power_manage();
+        NRF_LOG_INFO("mcu sleep!!\r\n ");
+        (void)sd_power_system_off();
     }
 }
 

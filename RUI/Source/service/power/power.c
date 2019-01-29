@@ -35,9 +35,3 @@ void power_save_open()
     Gps_standby();
 #endif
 }
-
-void power_save_close()
-{  
-    NRF_LOG_INFO("power save close!\r\n");
-    sensors_init();    
-}

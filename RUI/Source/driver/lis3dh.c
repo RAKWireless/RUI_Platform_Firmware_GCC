@@ -121,6 +121,72 @@ int lis3dh_init(void)
     {
         return -1;
     }
+    response = LIS3DH_SetInt1Pin(LIS3DH_I1_INT1_ON_PIN_INT1_ENABLE);
+    if(response==1)
+    {
+
+    }
+    else
+    {
+        return -1;
+    }
+    response = LIS3DH_SetInt1Threshold(5);
+    if(response==1)
+    {
+    
+    }
+    else
+    {
+        return -1;
+    }    
+    response = LIS3DH_SetIntConfiguration(LIS3DH_INT1_ZHIE_ENABLE | LIS3DH_INT1_ZLIE_ENABLE |
+                                               LIS3DH_INT1_XHIE_ENABLE | LIS3DH_INT1_XLIE_ENABLE  |
+                                               LIS3DH_INT1_YHIE_ENABLE | LIS3DH_INT1_YLIE_ENABLE);
+    if(response==1)
+    {
+
+    }
+    else
+    {
+        return -1;
+    } 
+    response = LIS3DH_SetIntMode(LIS3DH_INT_MODE_6D_POSITION);
+    if(response==1)
+    {
+
+    }
+    else
+    {
+        return -1;
+    } 
+
+    response = LIS3DH_SetInt6D4DConfiguration(LIS3DH_INT1_6D_ENABLE);
+    if(response==1)
+    {
+
+    }
+    else
+    {
+        return -1;
+    }
+    response = LIS3DH_SetInt1Duration(1);
+    if(response==1)
+    {
+
+    }
+    else
+    {
+        return -1;
+    }  
+    response = LIS3DH_HPFAOI1Enable(MEMS_ENABLE);
+    if(response==1)
+    {
+
+    }
+    else
+    {
+        return -1;
+    }  
     return 0;
 }
 
