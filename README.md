@@ -1,5 +1,13 @@
 ***************************************************************************************************************************************
 
+Update log 2019.1.29
+  
+1. Add deep sleep mode which mcu enters system off mode and peripheral like gsm, gps turns off except ACC. Because acc will wake up mcu and reset all.
+2. Remember to turn off debug way like log, which will prevent mcu to enter system off mode
+3. The way to wake up moudle is to waggle moudle for accelerated interrupt
+4. The consumption in deep sleep mode is near to 0.96mA~1.5mA according to the specific moudle.
+***************************************************************************************************************************************
+
 Update log 2019.1.25
   
 Add power control api for bg96 and accelerometer and the usage is shown in test_task.c. 
