@@ -337,7 +337,7 @@ int Gsm_CheckSimCmd(void)
 void Gsm_print(uint8_t *at_cmd)
 {
     uint8_t cmd_len;
-    uint8_t CMD[128] = {0};
+    uint8_t CMD[528] = {0};
     if(at_cmd == NULL)
         return;
     memset(CMD, 0, GSM_GENER_CMD_LEN);
