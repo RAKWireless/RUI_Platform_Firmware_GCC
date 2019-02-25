@@ -334,10 +334,10 @@ int Gsm_CheckSimCmd(void)
 void Gsm_print(uint8_t *at_cmd)
 {
     uint8_t cmd_len;
-    uint8_t CMD[128] = {0};
+    uint8_t CMD[512] = {0};
     if(at_cmd == NULL)
         return;
-    memset(CMD, 0, GSM_GENER_CMD_LEN);
+    memset(CMD, 0, 512);
     cmd_len = sprintf(CMD, "%s\r\n", at_cmd);
     GSM_UART_TxBuf(CMD, cmd_len);
 }
