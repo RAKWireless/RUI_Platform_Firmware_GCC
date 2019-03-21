@@ -1,6 +1,10 @@
+#RUI Version:2.0
 #numbers of supported mcu is from 1 to 9
 #numbers of supported connectivity chips is from 1-9,a-z,A-Z, at most 61
 #numbers of supported sensors is from 1-9,a-z,A-Z, at most 61
+
+include Makefile_Custome
+
 PROJECT_NAME     := RUI
 TARGETS          := nrf52_xxaa
 OUTPUT_DIRECTORY := _build
@@ -16,6 +20,41 @@ $(OUTPUT_DIRECTORY)/nrf52_xxaa.out: \
   LINKER_SCRIPT  := rui_gcc_nrf52840.ld
 endif
 # Source files common to all targets
+
+
+
+ifeq (1, $(REGION))
+  CFLAGS += -DREGION_AS923
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionAS923.c
+else ifeq (2, $(REGION))
+  CFLAGS += -DREGION_AU915
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionAU915.c
+else ifeq (3, $(REGION))
+  CFLAGS += -DREGION_CN470
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionCN470.c
+else ifeq (4, $(REGION))
+  CFLAGS += -DREGION_CN779
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionCN779.c
+else ifeq (5, $(REGION))
+  CFLAGS += -DREGION_EU433
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionEU433.c
+else ifeq (6, $(REGION))
+  CFLAGS += -DREGION_EU868
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionEU868.c
+else ifeq (7, $(REGION))
+  CFLAGS += -DREGION_IN865
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionIN865.c
+else ifeq (8, $(REGION))
+  CFLAGS += -DREGION_KR920
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionKR920.c
+else ifeq (9, $(REGION))
+  CFLAGS += -DREGION_US915
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionUS915.c
+else ifeq (10, $(REGION))
+  CFLAGS += -DREGION_US915_Hybrid
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionUS915-Hybrid.c
+endif
+
 
 ifeq (2, $(word 1, $(P)))
   SRC_FILES += $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c
@@ -48,6 +87,7 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_clock.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_twim.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_twi.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spim.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
@@ -120,6 +160,7 @@ SRC_FILES += \
   $(SDK_ROOT)/RUI/Source/board/itracker_basic.c \
   $(SDK_ROOT)/components/libraries/uart/app_uart_fifo.c \
   $(SDK_ROOT)/RUI/Source/external/utilities.c \
+  $(SDK_ROOT)/RUI/Source/external/utils.c \
   $(SDK_ROOT)/RUI/Source/hal/hal_gpio.c \
   $(SDK_ROOT)/RUI/Source/hal/hal_i2c.c \
   $(SDK_ROOT)/RUI/Source/hal/hal_spi.c \
@@ -140,6 +181,16 @@ else ifeq (2, $(word 2, $(P)))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/bg96.c
 else ifeq (3, $(word 2, $(P)))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/m35.c
+else ifeq (4, $(word 2, $(P)))
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/sx1276_lora.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/radio/sx1276/sx1276.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/Region.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/LoRaMac.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/LoRaMacCrypto.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/system/crypto/aes.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/system/crypto/cmac.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionCommon.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/service/lora/app_lora.c
 endif
 
 ifeq (1, $(findstring 1, $(wordlist 3, $(NUM), $(P))))
@@ -157,6 +208,15 @@ endif
 ifeq (5, $(findstring 5, $(wordlist 3, $(NUM), $(P))))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/opt3001.c
 endif
+ifeq (6, $(findstring 6, $(wordlist 3, $(NUM), $(P))))
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/sht31.c
+endif
+ifeq (7, $(findstring 7, $(wordlist 3, $(NUM), $(P))))
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/gps_max7.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/service/sensor/gps.c
+endif
+
+
 # Include folders common to all targets
 
 ifeq (2, $(word 1, $(P)))
@@ -167,6 +227,7 @@ ifeq (2, $(word 1, $(P)))
   INC_FOLDERS += $(SDK_ROOT)/components/libraries/mutex  
   INC_FOLDERS += $(SDK_ROOT)/components/softdevice/s140/headers
   INC_FOLDERS += $(SDK_ROOT)/components/softdevice/s140/headers/nRF52
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/config/52840_board 
 else ifeq (1, $(word 1, $(P)))
   INC_FOLDERS += $(SDK_ROOT)/components/libraries/experimental_log
   INC_FOLDERS += $(SDK_ROOT)/components/libraries/experimental_log/src
@@ -174,6 +235,26 @@ else ifeq (1, $(word 1, $(P)))
   INC_FOLDERS += $(SDK_ROOT)/components/softdevice/s132/headers
   INC_FOLDERS += $(SDK_ROOT)/components/softdevice/s132/headers/nRF52
 endif
+
+ifeq (1, $(word 1, $(P)))
+	ifeq (4, $(word 2, $(P)))
+    		INC_FOLDERS += $(SDK_ROOT)/RUI/Source/config/52832_board/lora815
+	else
+        	INC_FOLDERS += $(SDK_ROOT)/RUI/Source/config/52832_board/itracker
+    	endif
+endif
+
+
+ifeq (4, $(word 2, $(P)))
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/radio
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/radio/sx1276
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/system/crypto
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/system
+  INC_FOLDERS += $(SDK_ROOT)/modules/nrfx/drivers/include
+endif
+
 
 INC_FOLDERS += \
   $(SDK_ROOT)/components \
@@ -266,6 +347,9 @@ endif
 ifeq (3, $(word 2, $(P)))
   CFLAGS += -DM35_TEST
 endif
+ifeq (4, $(word 2, $(P)))
+  CFLAGS += -DLORA_TEST
+endif
 
 ifeq (1, $(findstring 1, $(wordlist 3, $(NUM), $(P))))
   CFLAGS += -DBEM280_TEST
@@ -282,6 +366,13 @@ endif
 ifeq (5, $(findstring 5, $(wordlist 3, $(NUM), $(P))))
   CFLAGS += -DOPT3001_TEST
 endif
+ifeq (6, $(findstring 6, $(wordlist 3, $(NUM), $(P))))
+  CFLAGS += -DSHT31_TEST
+endif
+ifeq (7, $(findstring 7, $(wordlist 3, $(NUM), $(P))))
+  CFLAGS += -DMAX7_TEST
+endif
+
 
 CFLAGS += $(OPT)
 ifeq (2, $(word 1, $(P)))
@@ -298,10 +389,13 @@ else ifeq (1, $(word 1, $(P)))
    CFLAGS += -DNRF52_PAN_74
    CFLAGS += -DNRF52
    CFLAGS += -DDEBUG
+   CFLAGS += -DS132
    CFLAGS += -DCONFIG_NFCT_PINS_AS_GPIOS
 endif
 
-
+ifeq (1, $(SLEEP_MODE))
+   CFLAGS += -DSLEEP_MODE
+endif
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -DSWI_DISABLE0
 CFLAGS += -mcpu=cortex-m4
@@ -322,13 +416,18 @@ ASMFLAGS += -mthumb -mabi=aapcs
 ASMFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 ASMFLAGS += -DCONFIG_GPIO_AS_PINRESET
 ASMFLAGS += -DFLOAT_ABI_HARD
+ASMFLAGS += -DSOFTDEVICE_PRESENT
+
+ifeq (1, $(SLEEP_MODE))
+   ASMFLAGS += -DSLEEP_MODE
+endif
+
 
 ifeq (2, $(word 1, $(P)))
   ASMFLAGS += -DBOARD_PCA10056
   ASMFLAGS += -DNRF52840_XXAA
   ASMFLAGS += -DNRF_SD_BLE_API_VERSION=6
   ASMFLAGS += -DS140
-  ASMFLAGS += -DSOFTDEVICE_PRESENT
   ASMFLAGS += -DSWI_DISABLE0
 else ifeq (1, $(word 1, $(P)))
   ASMFLAGS += -DBOARD_PCA10040
@@ -336,6 +435,7 @@ else ifeq (1, $(word 1, $(P)))
   ASMFLAGS += -DNRF52
   ASMFLAGS += -DNRF52832_XXAA
   ASMFLAGS += -DNRF52_PAN_74
+  ASMFLAGS += -DS132
 endif
 
 # Linker flags
@@ -394,7 +494,8 @@ help:
 *                 *                 *                                  *\n  \
 *  \033[36m1. nRF52832\033[0m    * \033[35m1. bc95-g\033[0m       * \033[33m1. bme280   2. L_70_R\033[0m            *\n  \
 *  \033[36m2. nRF52840\033[0m    * \033[35m2. bg96\033[0m         * \033[33m3. lis2mdl  4. lis3dh\033[0m            *\n  \
-*                 * \033[35m3. m35\033[0m          * \033[33m5. opt3001\033[0m                       *\n  \
+*                 * \033[35m3. m35\033[0m          * \033[33m5. opt3001\033[0m  \033[33m6. sht31\033[0m             *\n  \
+*                 * \033[35m4. sx1276\033[0m       * \033[33m7. ublox-max7\033[0m                    * \n  \
 *                                                                      *\n  \
 *  \033[32m3. Compile command  \033[0m                                                *\n  \
 *                                                                      *\n  \
@@ -403,10 +504,14 @@ help:
 *  -- \033[31mmake P=\"1 2 3 5\"\033[0m  -- mcu(1) commu(2) sensor(3 5 ...)             *\n  \
 *  eg Rak_8212 compile cmd \033[31mmake P=\"1 2 1 3 4 5\"\033[0m                        *\n  \
 *  choose the corresponding sensor and remember to change pin number   *\n  \
-*  in RUI\Source\include\board_basic.h                                    *\n  \
+*  in RUI/Source/config/XXXX_board/pin_define.h                        *\n  \
 *                                                                      *\n  \
 *  -- \033[31mmake help\033[0m -- show RUI description                                *\n  \
 *                                                                      *\n  \
+*  \033[32m4. Custome\033[0m                                                          *\n  \
+*  LoRaWAN and sleep mode for all products have been added in RUI.     *\n  \
+*  More features will be added further, so users can change in the     *\n  \
+*  \033[31mMakefile_Custome\033[0m according to need. More details in RUI\doc\        *\n  \
 ************************************************************************"   \
 
 TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
@@ -418,16 +523,5 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 .PHONY: flash erase
 
-# Flash the program
-flash: $(OUTPUT_DIRECTORY)/nrf52832_xxaa.hex
-	@echo Flashing: $<
-	nrfjprog -f nrf52 --program $< --sectorerase
-	nrfjprog -f nrf52 --reset
 
-erase:
-	nrfjprog -f nrf52 --eraseall
 
-SDK_CONFIG_FILE := $(SDK_ROOT)/RUI/Source/sdk_config.h
-CMSIS_CONFIG_TOOL := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar
-sdk_config:
-	java -jar $(CMSIS_CONFIG_TOOL) $(SDK_CONFIG_FILE)

@@ -22,8 +22,40 @@
 #include "hal_uart.h"
 
 
+#ifdef LORA_TEST
+uint32_t lora_send(uint8_t *cmd);
+#endif
+
 itracker_function_stru itracker_function;
 extern GSM_RECEIVE_TYPE g_type;
+
+#ifdef SHT31_TEST
+
+float g_humidity = 0;;
+uint32_t get_sht31_temp_bus(double *temp)
+{
+    uint32_t ret = 1;
+    float temp_t;
+    if(temp == NULL)
+    {
+        return 1;
+    }
+
+    if (Sht31_startMeasurementHighResolution() == 0)
+      {
+          Sht31_readMeasurement_ft(&g_humidity,&temp_t);
+      }
+     *temp = (double)temp_t;
+}
+uint32_t get_sht31_humidity_bus(double *humidity)
+{
+    if(humidity == NULL)
+    {
+        return 1;
+    }
+    *humidity = (double)g_humidity;
+}
+#endif
 
 #ifdef BEM280_TEST
 uint32_t get_bme280_temp_bus(double *temp)
@@ -167,9 +199,35 @@ void Gsm_wait_response(uint8_t *rsp, uint32_t len, uint32_t timeout,GSM_RECEIVE_
 }
 #endif
 
+#ifdef MAX7_TEST
+extern uint8_t GpsDataBuffer[512];
+uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
+{   
+        double lat = 0;
+        double lon = 0;    
+        if(data == NULL || len < 0)
+        {
+               return 1;
+        }
+
+        Max7GpsReadDataStream();
+        NRF_LOG_INFO( "gps: %s\r\n", GpsDataBuffer);
+        memcpy(data,GpsDataBuffer,128);
+       // if (GpsParseGpsData(GpsDataBuffer, 512))
+       //  {
+       //     GpsGetLatestGpsPositionDouble(&lat, &lon);
+       // }
+
+       //   sprintf(data,"lat=%f , lot=%f \r\n",lat,lon);
+}
+#endif
 void itracker_function_init()
 {
     memset(&itracker_function,0,sizeof(itracker_function));
+#ifdef SHT31_TEST
+    itracker_function.temperature_get = get_sht31_temp_bus;
+    itracker_function.humidity_get = get_sht31_humidity_bus;
+#endif
 #ifdef BEM280_TEST
     itracker_function.temperature_get = get_bme280_temp_bus;
     itracker_function.humidity_get = get_bme280_humidity_bus;
@@ -185,12 +243,16 @@ void itracker_function_init()
     itracker_function.light_strength_get = get_opt3001_data_bus;
 #endif
 
-#if defined(L70R_TEST) ||  defined(BG96_TEST)
+#if defined(L70R_TEST) ||  defined(BG96_TEST) ||  defined(MAX7_TEST)
     itracker_function.gps_get = gps_data_get_bus;
 #endif
 
 #if defined(BC95G_TEST) || defined(M35_TEST) || defined(BG96_TEST)
     itracker_function.communicate_send = Gsm_print;
     itracker_function.communicate_response = Gsm_wait_response;
+#endif
+
+#ifdef LORA_TEST
+    itracker_function.communicate_send = lora_send;
 #endif
 }

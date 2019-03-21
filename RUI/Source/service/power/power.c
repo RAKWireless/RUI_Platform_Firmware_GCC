@@ -23,6 +23,11 @@
 extern void Gps_standby(void);
 #endif
 
+#ifdef LORA_TEST
+extern void SX1276SetSleep( void );
+extern int lora_send_ok;
+#endif
+
 void power_save_open()
 {
     NRF_LOG_INFO("power save open!\r\n");
@@ -33,5 +38,16 @@ void power_save_open()
 
 #ifdef L70R_TEST
     Gps_standby();
+#endif
+
+#ifdef MAX7_TEST
+    gps_poweroff();
+#endif
+
+#ifdef LORA_TEST
+    if(lora_send_ok == 1)
+    {
+   	 SX1276SetSleep( );
+    }
 #endif
 }

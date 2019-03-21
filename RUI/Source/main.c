@@ -55,6 +55,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
+#include "queue.h"
+#include "semphr.h"
 #include "nordic_common.h"
 #include "nrf.h"
 #include "ble_hci.h"
@@ -143,6 +145,31 @@ static ble_uuid_t m_adv_uuids[]          =                                      
 //test task
 extern void test_task(void * pvParameter);
 
+#ifdef LORA_TEST
+uint8_t JOIN_FLAG = 0;  // 0-not connect; 1- connect
+extern int lora_send_ok;
+
+xSemaphoreHandle xBinarySemaphore = NULL;
+extern void SX1276OnDio0Irq(void); 
+extern lora_cfg_t g_lora_cfg_t;
+extern int  parse_lora_config(char* str, lora_cfg_t *cfg);
+extern void write_lora_config(void);
+void lora_task(void * pvParameter)
+{
+    while(1)
+    {
+         if( xSemaphoreTake( xBinarySemaphore, portMAX_DELAY ) == pdTRUE )
+         {
+             SX1276OnDio0Irq();
+         }
+         vTaskDelay(2000);
+    }
+
+}
+
+#endif
+
+
 #ifdef DFU_TEST
 //dfu task
 extern void dfu_settings_init(void);
@@ -182,8 +209,16 @@ void vApplicationIdleHook( void )
 {
     while(1)
     {
-        NRF_LOG_INFO("mcu sleep!!\r\n ");
-        (void)sd_power_system_off();
+#ifdef SLEEP_MODE
+#ifdef LORA_TEST
+	if(lora_send_ok==1)
+        {
+             (void)sd_power_system_off();
+        }
+#else
+	(void)sd_power_system_off();
+#endif
+#endif
     }
 }
 
@@ -265,7 +300,13 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
 
         NRF_LOG_DEBUG("Received data from BLE NUS. Writing data on UART.");
         NRF_LOG_HEXDUMP_DEBUG(p_evt->params.rx_data.p_data, p_evt->params.rx_data.length);
-
+#ifdef LORA_TEST
+        if(strncmp((char*)p_evt->params.rx_data.p_data, "lora_cfg:", strlen("lora_cfg:")) == 0)
+        {
+            parse_lora_config((char*)p_evt->params.rx_data.p_data+strlen("lora_cfg:"), &g_lora_cfg_t);
+            write_lora_config();
+        }
+#endif
         for (uint32_t i = 0; i < p_evt->params.rx_data.length; i++)
         {
             do
@@ -575,7 +616,7 @@ void gatt_init(void)
     err_code = nrf_ble_gatt_init(&m_gatt, gatt_evt_handler);
     APP_ERROR_CHECK(err_code);
 
-    err_code = nrf_ble_gatt_att_mtu_periph_set(&m_gatt, 64);
+    err_code = nrf_ble_gatt_att_mtu_periph_set(&m_gatt, NRF_SDH_BLE_GATT_MAX_MTU_SIZE);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -795,7 +836,7 @@ static void peer_manager_init(void)
     err_code = pm_register(pm_evt_handler);
     APP_ERROR_CHECK(err_code);
 }
-/*----------------------------iTracker application-------------------------------*/
+/*----------------------------RUI application-------------------------------*/
 
 /**@brief Application main function.
  */
@@ -832,8 +873,22 @@ int main(void)
     // dfu task is the only background task
     xReturned = xTaskCreate(dfu_task, "dfu", 512, NULL, 1, NULL);
 #endif
-    //test task
+    //
     xReturned = xTaskCreate(test_task, "test", 512, NULL, 2, NULL);
+#ifdef LORA_TEST
+
+    vSemaphoreCreateBinary(xBinarySemaphore);
+    if(xBinarySemaphore == NULL)
+    {
+        NRF_LOG_INFO("xBinarySemaphore is NULL\r\n");
+    }
+   //creat lorawan IRQ sync task for TX and RX interrupt
+    xReturned = xTaskCreate(lora_task, "lora", 256, NULL, 1, NULL);
+   //test task
+
+#endif
+
+
     // Start FreeRTOS scheduler.
 
     vTaskStartScheduler();

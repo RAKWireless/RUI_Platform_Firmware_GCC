@@ -59,7 +59,7 @@
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 #define configUSE_TICKLESS_IDLE 1
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG                                      1 /* See into vPortSuppressTicksAndSleep source code for explanation */
-#define configCPU_CLOCK_HZ                                                        ( SystemCoreClock )
+#define configCPU_CLOCK_HZ                                                        ( 32768UL )
 #define configTICK_RATE_HZ                                                        (portTickType)1000
 #define configMAX_PRIORITIES                                                      ( 3 )
 #define configMINIMAL_STACK_SIZE                                                  ( 60 )

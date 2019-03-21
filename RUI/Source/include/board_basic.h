@@ -3,14 +3,25 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
+#include "queue.h"
+#include "semphr.h"
 #include "app_error.h"
+#include "app_timer.h"
 #include "nrf_log.h"
 #include "nrf_gpio.h"
+#include "nrf_drv_rtc.h"
 #include "nrf_delay.h"
 #include "app_uart.h"
 #include "utilities.h"
 #include "gps.h"
 #include "SEGGER_RTT.h"
+#include "hal_spi.h"
+#include "hal_gpio.h"
+#include "hal_uart.h"
+#include "pin_define.h"
 
 #if defined(BG96_TEST)
 #include "bg96.h"
@@ -21,6 +32,18 @@
 #if defined(BC95G_TEST)
 #include "bc95-g.h"
 #endif
+#if defined(SHT31_TEST)
+#include "sht31.h"
+#endif
+#if defined(MAX7_TEST)
+#include "gps_max7.h"
+#endif
+
+#ifdef LORA_TEST
+#include "radio.h"
+#include "sx1276.h"
+#include "sx1276_lora.h"
+#endif
 
 
 typedef enum GSM_RECEIVE_TYPE
@@ -28,6 +51,17 @@ typedef enum GSM_RECEIVE_TYPE
 	GSM_TYPE_CHAR,
 	GSM_TYPE_FILE,
 }GSM_RECEIVE_TYPE;
+
+
+typedef struct {
+        uint8_t sof;
+        uint8_t dev_eui[8];
+        uint8_t app_eui[8];
+        uint8_t app_key[16];
+        uint32_t dev_addr;
+        uint8_t nwkskey[16];
+        uint8_t appskey[16];
+} lora_cfg_t;
 
 
 /*!
@@ -41,169 +75,6 @@ typedef enum GSM_RECEIVE_TYPE
 #define FAIL		0
 #endif
 
-
- 
-/*!
- * Pin definitions
- */
-#define RADIO_DIO_0		P7
-#define RADIO_DIO_1		P8
-#define RADIO_DIO_2		P9
-#define RADIO_DIO_3		P10
-
-#define RADIO_NSS		P14
-#define RADIO_MOSI		P13
-#define RADIO_MISO		P12
-#define RADIO_SCK		P11
-
-#define RADIO_RESET		P6
-#define RADIO_TCXO		P5
-#define RADIO_RF_CTX	P23
-#define RADIO_RF_CPS	P22
-
-#define ASSERT_ERROR	0xA55EA55E
-
-#define USE_FULL_ASSERT
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  The assert_param macro is used for function's parameters check.
-  * @param  expr: If expr is false, it calls assert_failed function
-  *         which reports the name of the source file and the source
-  *         line number of the call that failed.
-  *         If expr is true, it returns no value.
-  * @retval None
-  */
-	#define assert_param(expr)	((expr) ? (void)0U : app_error_handler(ASSERT_ERROR, __LINE__, (const uint8_t *)__FILE__))
-#else
-	#define assert_param(expr) ((void)0U)
-#endif /* USE_FULL_ASSERT */
-
-	
-	//#define BC95
-//#define M35
-
-/*
-		UART PIN Assignment
-		P028_UART1_RX
-		P029_UART1_TX
-
-*/
-#define             LOG_RXD_PIN                        28
-#define             LOG_TXD_PIN                        29
-
-/*
-		GSM PIN Assignment
-		GSM_PWR_ON		--	P0.06
-		GSM_TXD			--	P0.12
-		GSM_RESET		--	P0.14
-		GSM_PWRKEY		--	P0.15
-		GSM_RXD			--	P0.20
-
-*/
-	
-
-
-#define             GSM_PWR_ON_PIN                        6
-#define             GSM_RESET_PIN                        14
-#define             GSM_PWRKEY_PIN                        15
-
-#if defined(BG96_TEST)
-#define             GSM_TXD_PIN                        9
-#define             GSM_RXD_PIN                        7
-#endif
-#if defined(M35_TEST)
-#define             GSM_TXD_PIN                        12
-#define             GSM_RXD_PIN                        20
-#endif
-#if defined(BC95G_TEST)
-#define             GSM_TXD_PIN                        20
-#define             GSM_RXD_PIN                        12
-#endif
-
-
-#define             GSM_PWR_ON                     nrf_gpio_pin_write ( GSM_PWR_ON_PIN, 1 )
-#define             GSM_PWR_OFF                      nrf_gpio_pin_write ( GSM_PWR_ON_PIN, 0 )
-
-#define             GSM_PWRKEY_HIGH                           nrf_gpio_pin_write ( GSM_PWRKEY_PIN, 0 )
-#define             GSM_PWRKEY_LOW                            nrf_gpio_pin_write ( GSM_PWRKEY_PIN, 1 )
-
-#define             GSM_RESET_HIGH                           nrf_gpio_pin_write ( GSM_RESET_PIN, 0 )
-#define             GSM_RESET_LOW                            nrf_gpio_pin_write ( GSM_RESET_PIN, 1 )
-
-
-/*
-		GPS PIN Assignment
-		GPS_STANDBY		--	P0.07
-		GPS_TXD			--	P0.08
-		GPS_RXD		--	P0.09(nfc default)
-		GPS_PWR_ON		--	P0.10
-		GPS_RESET		--	P0.31
-
-*/
-#define             GPS_STANDBY_PIN                        7
-#define             GPS_TXD_PIN                        8
-#define             GPS_RXD_PIN                        9
-#define 						GPS_PWR_ON_PIN											10
-#define             GPS_RESET_PIN                        31
-
-#define             GPS_PWR_ON                     nrf_gpio_pin_write ( GPS_PWR_ON_PIN, 1 )
-#define             GPS_PWR_OFF                      nrf_gpio_pin_write ( GPS_PWR_ON_PIN, 0 )
-
-#define             GPS_RESET_HIGH                           nrf_gpio_pin_write ( GPS_RESET_PIN, 1 )
-#define             GPS_RESET_LOW                            nrf_gpio_pin_write ( GPS_RESET_PIN, 0 )
-
-
-/*
-		lis3dh PIN Assignment
-		LIS3DH_SCL		--	P0.18
-		LIS3DH_SDA		--	P0.19
-		LIS3DH_INT1		--	P0.25
-		LIS3DH_RES		--	P0.26
-		LIS3DH_INT2		--	P0.27
-		
-*/
-#define             LIS3DH_TWI_SCL_PIN                        18
-#define             LIS3DH_TWI_SDA_PIN                        19
-#define             LIS3DH_INT1_PIN                        25
-#define 						LIS3DH_RES_PIN											26
-#define             LIS3DH_INT2_PIN                        27
-
-/*
-		lis2mdl PIN Assignment
-		LIS2MDL_SCL		--	P0.11
-		LIS2MDL_SDA		--	P0.13
-		LIS2MDL_INT		--	P0.16
-		
-*/
-#define             LIS2MDL_TWI_SCL_PIN                        11
-#define             LIS2MDL_TWI_SDA_PIN                        13
-#define             LIS2MDL_INT_PIN                        16
-
-
-/*
-		bme280 PIN Assignment
-		BME_CS		--	P0.02
-		BME_SDI		--	P0.03
-		BME_SCK		--	P0.04
-		BME_SDO		--	P0.05
-		
-*/
-#define             BME280_SPI_CS_PIN                        2
-#define             BME280_SPI_SDI_PIN                        3
-#define             BME280_SPI_SCK_PIN                        4
-#define             BME280_SPI_SDO_PIN                        5
-
-
-/*
-		OPT3001 PIN Assignment
-		OPT_SDA		--	P0.21
-		OPT_INT		--	P0.22
-		OPT_SCL		--	P0.23
-		
-*/
-#define             OPT3001_TWI_SDA_PIN                        26//21
-#define             OPT3001_INT_PIN                        		 22
-#define             OPT3001_TWI_SCL_PIN                        23
 
 
 /*
@@ -401,162 +272,87 @@ void GpsMcuProcess( void );
 void GpsMcuIrqNotify( void );
 
 /*!
- * nRF52 Pin Names
+ * \brief Timer object description
  */
-#define MCU_PINS \
-	P0,  P1,  P2,  P3,  P4,  P5,  P6,  P7,  P8,  P9,  P10, P11, P12, P13, P14, P15, \
-	P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P27, P28, P29, P30, P31
+//typedef	struct {
+//	app_timer_id_t	    id;
+//	app_timer_t		timer;
+//	uint32_t		timeout;
+//} TimerEvent_t;
+typedef	struct {
+	TimerHandle_t 	  id;
+	uint32_t		timeout;
+}TimerEvent_t;
 
+typedef uint32_t TimerTime_t;
 
 /*!
- * Board GPIO pin names
- */
-typedef enum
-{
-    MCU_PINS,
-
-    // Not connected
-    NC = (int)0xFFFFFFFF
-} PinNames;
-
-/*!
- * Operation Mode for the GPIO
- */
-typedef enum
-{
-    PIN_INPUT = 0,
-    PIN_OUTPUT,
-} PinModes;
-
-/*!
- * Add a pull-up, a pull-down or nothing on the GPIO line
- */
-typedef enum
-{
-    PIN_NO_PULL = 0,
-    PIN_PULL_UP,
-    PIN_PULL_DOWN
-} PinTypes;
-
-/*!
- * Define the GPIO as Push-pull type or Open Drain
- */
-typedef enum
-{
-    PIN_PUSH_PULL = 0,
-    PIN_OPEN_DRAIN
-} PinConfigs;
-
-/*!
- * Define the GPIO IRQ on a rising, falling or both edges
- */
-typedef enum
-{
-    NO_IRQ = 0,
-    IRQ_RISING_EDGE,
-    IRQ_FALLING_EDGE,
-    IRQ_RISING_FALLING_EDGE
-} IrqModes;
-
-/*!
- * Define the IRQ priority on the GPIO
- */
-typedef enum
-{
-    IRQ_VERY_LOW_PRIORITY = 0,
-    IRQ_LOW_PRIORITY,
-    IRQ_MEDIUM_PRIORITY,
-    IRQ_HIGH_PRIORITY,
-    IRQ_VERY_HIGH_PRIORITY
-} IrqPriorities;
-
-/*!
- * Structure for the GPIO
- */
-typedef struct
-{
-    PinNames	pin;
-    PinModes	mode;
-    PinTypes	pull;
-    IrqModes	irq_mode;
-	void *		port;
-} Gpio_t;
-
-/*!
- * GPIO IRQ handler function prototype
- */
-typedef void( GpioIrqHandler )( void );
-
-/*!
- * GPIO Expander IRQ handler function prototype
- */
-typedef void( GpioIoeIrqHandler )( void );
-
-/*!
- * \brief Initializes the given GPIO object
+ * \brief Initializes the timer object
  *
- * \param [IN] obj    Pointer to the GPIO object
- * \param [IN] pin    Pin name ( please look in pinName-board.h file )
- * \param [IN] mode   Pin mode [PIN_INPUT, PIN_OUTPUT,
- *                              PIN_ALTERNATE_FCT, PIN_ANALOGIC]
- * \param [IN] config Pin config [PIN_PUSH_PULL, PIN_OPEN_DRAIN]
- * \param [IN] type   Pin type [PIN_NO_PULL, PIN_PULL_UP, PIN_PULL_DOWN]
- * \param [IN] value  Default output value at initialization
+ * \remark TimerSetValue function must be called before starting the timer.
+ *         this function initializes timestamp and reload value at 0.
+ *
+ * \param [IN] obj          Structure containing the timer object parameters
+ * \param [IN] callback     Function callback called at the end of the timeout
  */
-void GpioInit( Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, PinTypes type, uint32_t value );
+void TimerInit( TimerEvent_t *obj, void ( *callback )( void ) );
 
 /*!
- * \brief GPIO IRQ Initialization
+ * \brief Starts and adds the timer object to the list of timer events
  *
- * \param [IN] obj         Pointer to the GPIO object
- * \param [IN] irqMode     IRQ mode [NO_IRQ, IRQ_RISING_EDGE,
- *                                   IRQ_FALLING_EDGE, IRQ_RISING_FALLING_EDGE]
- * \param [IN] irqPriority IRQ priority [IRQ_VERY_LOW_PRIORITY, IRQ_LOW_PRIORITY
- *                                       IRQ_MEDIUM_PRIORITY, IRQ_HIGH_PRIORITY
- *                                       IRQ_VERY_HIGH_PRIORITY]
- * \param [IN] irqHandler  Callback function pointer
+ * \param [IN] obj Structure containing the timer object parameters
  */
-void GpioSetInterrupt( Gpio_t *obj, IrqModes irqMode, IrqPriorities irqPriority, GpioIrqHandler *irqHandler );
+void TimerStart( TimerEvent_t *obj );
 
 /*!
- * \brief Removes the interrupt from the object
+ * \brief Stops and removes the timer object from the list of timer events
  *
- * \param [IN] obj Pointer to the GPIO object
+ * \param [IN] obj Structure containing the timer object parameters
  */
-void GpioRemoveInterrupt( Gpio_t *obj );
+void TimerStop( TimerEvent_t *obj );
 
 /*!
- * \brief Writes the given value to the GPIO output
+ * \brief Set timer new timeout value
  *
- * \param [IN] obj   Pointer to the GPIO object
- * \param [IN] value New GPIO output value
+ * \param [IN] obj   Structure containing the timer object parameters
+ * \param [IN] value New timer timeout value
  */
-void GpioWrite( Gpio_t *obj, uint32_t value );
+void TimerSetValue( TimerEvent_t *obj, uint32_t value );
 
 /*!
- * \brief Toggle the value to the GPIO output
+ * \brief Read the current time
  *
- * \param [IN] obj   Pointer to the GPIO object
+ * \retval time returns current time
  */
-void GpioToggle( Gpio_t *obj );
+TimerTime_t TimerGetCurrentTime( void );
 
 /*!
- * \brief Reads the current GPIO input value
+ * \brief Return the Time elapsed since a fix moment in Time
  *
- * \param [IN] obj Pointer to the GPIO object
- * \retval value   Current GPIO input value
- */
-uint32_t GpioRead( Gpio_t *obj );
+ * \param [IN] savedTime    fix moment in Time
+ * \retval time             returns elapsed time
+*/
+TimerTime_t TimerGetElapsedTime( TimerTime_t savedTime );
 
 /*!
- * \brief Deinitialize GPIO pin
- *
- * \param [IN] obj   Pointer to the GPIO object
+ * \brief Manages the entry into ARM cortex deep-sleep mode
  */
+void TimerLowPowerHandler( void );
+
+/*!
+ * \brief Computes the temperature compensation for a period of time on a
+ *        specific temperature.
+ *
+ * \param [IN] period Time period to compensate
+ * \param [IN] temperature Current temperature
+ *
+ * \retval Compensated time period
+ */
+TimerTime_t TimerTempCompensation( TimerTime_t period, float temperature );
+
 void GpioDeinit( Gpio_t *obj );
-void rui_printf(char *pt);
-
 void delay_ms(uint32_t ms);
 void power_save_open();
+void lora_init();
 
 #endif

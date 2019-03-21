@@ -130,7 +130,7 @@ int lis3dh_init(void)
     {
         return -1;
     }
-    response = LIS3DH_SetInt1Threshold(5);
+    response = LIS3DH_SetInt1Threshold(LIS3DH_INT1_THRESHOLD);
     if(response==1)
     {
     

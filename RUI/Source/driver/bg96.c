@@ -89,7 +89,7 @@ void Gsm_PowerUp(void)
 
     /*Pwr key keep to low at least 100ms*/
     GSM_PWRKEY_LOW;
-    delay_ms(300); //300ms
+    delay_ms(500); //300ms
     GSM_PWRKEY_HIGH;
     delay_ms(500);
 }

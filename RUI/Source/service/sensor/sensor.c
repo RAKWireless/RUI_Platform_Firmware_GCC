@@ -32,6 +32,10 @@ void sensors_init()
     Gps_Init();
 #endif
 
+#ifdef LORA_TEST
+    lora_init();
+#endif
+
 #ifdef BEM280_TEST
     ret = bme280_spi_init();
     if(ret != NRF_SUCCESS)
@@ -95,4 +99,20 @@ void sensors_init()
     }
 #endif
 
+#ifdef SHT31_TEST
+    ret = sht31_init();
+    if(ret < 0)
+    {
+        NRF_LOG_INFO( "sht31_init fail %d\r\n", ret);
+    }
+#endif
+
+#ifdef MAX7_TEST
+    ret =max_init();
+    if(ret < 0)
+    {
+        NRF_LOG_INFO( "max_init fail %d\r\n", ret);
+    }
+    gps_setup();
+#endif
 }

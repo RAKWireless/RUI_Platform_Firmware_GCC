@@ -12,7 +12,9 @@ static GpioIrqHandler* irq_handlers[32];
 static void pin_event_handler( nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action )
 {
     if (irq_handlers[pin] != NULL)
-        irq_handlers[pin]();
+        {
+           irq_handlers[pin]();
+        }
 }
 
 void GpioInit( Gpio_t *obj, PinNames pin, PinModes mode,  PinConfigs config, PinTypes type, uint32_t value )

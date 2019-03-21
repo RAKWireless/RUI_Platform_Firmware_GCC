@@ -1,9 +1,14 @@
 #include <nrfx.h>
 #include "hal_spi.h"
 
-#define SPI_BUFSIZE 512
-#define SPI_TIMEOUT			10000
+#define SPI_BUFSIZE                     512
+#define SPI_TIMEOUT			100000
+
+#ifdef LORA_TEST
+#define SPI_INSTANCE  0 /**< SPI instance index. */
+#else
 #define SPI_INSTANCE  1 /**< SPI instance index. */
+#endif
 
 static uint8_t   SPI_Tx_Buf[SPI_BUFSIZE];
 static uint8_t   SPI_Rx_Buf[SPI_BUFSIZE];

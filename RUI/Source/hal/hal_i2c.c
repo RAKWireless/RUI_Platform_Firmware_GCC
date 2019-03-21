@@ -8,10 +8,15 @@
 #include "hal_i2c.h"
 
 #define TWI_BUFFER_SIZE     	  14
-#define TWI_TIMEOUT			10000
+#define TWI_TIMEOUT			100000
 
+#ifdef LORA_TEST
 /* TWI instance ID. */
+#define TWI_INSTANCE_ID     1
+#else
 #define TWI_INSTANCE_ID     0
+
+#endif
 
 /* TWI instance. */
 static const nrf_drv_twi_t m_twi_instance = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
@@ -113,5 +118,74 @@ uint8_t rak_i2c_read(uint8_t twi_addr, uint8_t reg, uint8_t * data, uint16_t len
 void rak_i2c_deinit()
 {
     nrf_drv_twi_uninit(&m_twi_instance);
+}
+
+uint32_t rak_i2c_simple_write(uint8_t twi_addr, uint8_t *data, uint16_t len)
+{
+    uint32_t err_code;
+    uint32_t timeout = TWI_TIMEOUT;
+		
+    twi_tx_done = false;
+    err_code = nrf_drv_twi_tx(&m_twi_instance, twi_addr, data, len, false);
+    if(err_code != NRF_SUCCESS)
+    {
+      twi_tx_done = false;
+      return err_code;
+    }
+
+    while((!twi_tx_done) && --timeout);
+    if(!timeout) 
+    {
+      return NRF_ERROR_TIMEOUT;
+    }
+    twi_tx_done = false;
+
+    return err_code;
+}
+
+uint8_t rak_i2c_simple_read(uint8_t twi_addr, uint8_t * data, uint16_t len)
+{
+    uint32_t err_code;
+    uint32_t timeout = TWI_TIMEOUT;
+		
+    twi_rx_done = false;
+    err_code = nrf_drv_twi_rx(&m_twi_instance, twi_addr, data, len);
+    if(err_code != NRF_SUCCESS)
+    {
+      twi_rx_done = false;
+      return err_code;
+    }
+
+    timeout = TWI_TIMEOUT;
+    while((!twi_rx_done) && --timeout);
+    if(!timeout) 
+    {
+      return NRF_ERROR_TIMEOUT;
+    }
+    twi_rx_done = false;
+		
+    return err_code;
+}
+uint32_t rak_i2c_simple_write_m(uint8_t twi_addr, uint8_t *data, uint16_t len, bool repeated)
+{
+    uint32_t err_code;
+    uint32_t timeout = TWI_TIMEOUT;
+		
+    twi_tx_done = false;
+    err_code = nrf_drv_twi_tx(&m_twi_instance, twi_addr, data, len, repeated);
+    if(err_code != NRF_SUCCESS)
+    {
+      twi_tx_done = false;
+      return err_code;
+    }
+
+    while((!twi_tx_done) && --timeout);
+    if(!timeout) 
+    {
+      return NRF_ERROR_TIMEOUT;
+    }
+    twi_tx_done = false;
+
+    return err_code;
 }
 
