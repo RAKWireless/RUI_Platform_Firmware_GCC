@@ -1,5 +1,13 @@
 ***************************************************************************************************************************************
 
+Important update log RUI 2.0!!!!2019.3.21
+  
+1. Add LoRaWAN and support rak815/813 node, user can choose region in Makefile_Custome
+2. Optimize sleep mode, user can turn on/off it in Makefile_Custome
+
+More details in doc/
+***************************************************************************************************************************************
+
 Update log 2019.1.29
   
 1. Add deep sleep mode which mcu enters system off mode and peripheral like gsm, gps turns off except ACC. Because acc will wake up mcu and reset all.
