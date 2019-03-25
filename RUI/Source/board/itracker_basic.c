@@ -31,7 +31,7 @@ extern GSM_RECEIVE_TYPE g_type;
 
 #ifdef SHT31_TEST
 
-float g_humidity = 0;;
+float g_humidity = 0;
 uint32_t get_sht31_temp_bus(double *temp)
 {
     uint32_t ret = 1;
