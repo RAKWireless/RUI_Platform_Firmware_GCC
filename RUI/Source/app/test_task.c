@@ -45,7 +45,8 @@ void test_task(void * pvParameter)
 #endif
 #ifdef LIS3DH_TEST
         itracker_function.acceleration_get(&x,&y,&z);
-        NRF_LOG_INFO("acceleration x,y,z = %d,%d,%d\r\n",x,y,z);
+        NRF_LOG_INFO("acceleration x,y,z = %d mg,%d mg,%d mg",x,y,z);
+
 #endif
 #ifdef LIS2MDL_TEST
         itracker_function.magnetic_get(&magnetic_x,&magnetic_y,&magnetic_z);

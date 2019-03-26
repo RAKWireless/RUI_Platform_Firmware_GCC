@@ -105,6 +105,9 @@ uint32_t get_lis3dh_data_bus(int *x, int *y, int *z)
         NRF_LOG_INFO( "lis3dh_twi_init fail %d\r\n", ret);
     }
     get_lis3dh_data(x,y,z);
+	*x =*x * 4000/65536;
+	*y =*y * 4000/65536;
+	*z =*z * 4000/65536;	
     return ret;
 }
 #endif
