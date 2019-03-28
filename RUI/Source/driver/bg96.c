@@ -78,20 +78,7 @@ void Gsm_RingBuf(uint8_t in_data)
 void Gsm_PowerUp(void)
 {
     NRF_LOG_INFO("GMS_PowerUp\r\n");
-
-    GSM_PWR_OFF;
-    delay_ms(200);
-
-    /*Pwr stable wait at least 30ms before pulling down PWRKEY pin*/
-    GSM_PWR_ON;
-    GSM_RESET_HIGH;
-    delay_ms(60);		// >30ms
-
-    /*Pwr key keep to low at least 100ms*/
-    GSM_PWRKEY_LOW;
-    delay_ms(500); //300ms
-    GSM_PWRKEY_HIGH;
-    delay_ms(500);
+    POWER_ON;
 }
 
 
@@ -808,6 +795,7 @@ int Gsm_Init()
     Gsm_PowerUp();
     NRF_LOG_INFO( "check auto baud\r\n");
     rak_uart_init(GSM_USE_UART, GSM_RXD_PIN, GSM_TXD_PIN, UARTE_BAUDRATE_BAUDRATE_Baud115200);
+    delay_ms(1000);
     /*module init ,check is auto baud,if auto,config to 115200 baud.*/
     Gsm_CheckAutoBaud();
 

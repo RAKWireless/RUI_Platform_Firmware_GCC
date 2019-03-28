@@ -29,6 +29,30 @@ uint32_t lora_send(uint8_t *cmd);
 itracker_function_stru itracker_function;
 extern GSM_RECEIVE_TYPE g_type;
 
+#ifdef SHTC3_TEST
+
+float g_humidity = 0;
+uint32_t get_shtc3_temp_bus(double *temp)
+{
+    uint32_t ret = 1;
+    float temp_t;
+    if(temp == NULL)
+    {
+        return 1;
+    }
+    SHTC3_GetTempAndHumi(&temp_t,&g_humidity);
+
+    *temp = temp_t;
+}
+uint32_t get_shtc3_humidity_bus(double *humidity)
+{
+    if(humidity == NULL)
+    {
+        return 1;
+    }
+    *humidity = g_humidity;
+}
+#endif
 #ifdef SHT31_TEST
 
 float g_humidity = 0;
@@ -54,6 +78,23 @@ uint32_t get_sht31_humidity_bus(double *humidity)
         return 1;
     }
     *humidity = (double)g_humidity;
+}
+#endif
+
+#ifdef LPS22HB_TEST
+uint32_t get_lps22hb_pressure_bus(double *pressure)
+{
+    uint32_t ret = 1;
+    float tmp = 0;
+    if(pressure == NULL)
+    {
+        return 1;
+    }
+    
+    ret = get_lps22hb_data(&tmp);
+   *pressure = (double)tmp;
+    
+    return ret;
 }
 #endif
 
@@ -230,6 +271,14 @@ void itracker_function_init()
 #ifdef SHT31_TEST
     itracker_function.temperature_get = get_sht31_temp_bus;
     itracker_function.humidity_get = get_sht31_humidity_bus;
+#endif
+#ifdef SHTC3_TEST
+    itracker_function.temperature_get = get_shtc3_temp_bus;
+    itracker_function.humidity_get = get_shtc3_humidity_bus;
+#endif
+
+#ifdef LPS22HB_TEST
+    itracker_function.pressure_get = get_lps22hb_pressure_bus;
 #endif
 #ifdef BEM280_TEST
     itracker_function.temperature_get = get_bme280_temp_bus;

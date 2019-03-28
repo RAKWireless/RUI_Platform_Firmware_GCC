@@ -215,6 +215,12 @@ ifeq (7, $(findstring 7, $(wordlist 3, $(NUM), $(P))))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/gps_max7.c
   SRC_FILES += $(SDK_ROOT)/RUI/Source/service/sensor/gps.c
 endif
+ifeq (8, $(findstring 8, $(wordlist 3, $(NUM), $(P))))
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/shtc3.c
+endif
+ifeq (9, $(findstring 9, $(wordlist 3, $(NUM), $(P))))
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/lps22hb.c
+endif
 
 
 # Include folders common to all targets
@@ -372,6 +378,12 @@ endif
 ifeq (7, $(findstring 7, $(wordlist 3, $(NUM), $(P))))
   CFLAGS += -DMAX7_TEST
 endif
+ifeq (8, $(findstring 8, $(wordlist 3, $(NUM), $(P))))
+  CFLAGS += -DSHTC3_TEST
+endif
+ifeq (9, $(findstring 9, $(wordlist 3, $(NUM), $(P))))
+  CFLAGS += -DLPS22HB_TEST
+endif
 
 
 CFLAGS += $(OPT)
@@ -495,7 +507,8 @@ help:
 *  \033[36m1. nRF52832\033[0m    * \033[35m1. bc95-g\033[0m       * \033[33m1. bme280   2. L_70_R\033[0m            *\n  \
 *  \033[36m2. nRF52840\033[0m    * \033[35m2. bg96\033[0m         * \033[33m3. lis2mdl  4. lis3dh\033[0m            *\n  \
 *                 * \033[35m3. m35\033[0m          * \033[33m5. opt3001\033[0m  \033[33m6. sht31\033[0m             *\n  \
-*                 * \033[35m4. sx1276\033[0m       * \033[33m7. ublox-max7\033[0m                    * \n  \
+*                 * \033[35m4. sx1276\033[0m       * \033[33m7. ublox-max7  8. shtc3\033[0m          * \n  \
+*                 *                 * \033[33m9. lps22hb\033[0m                       * \n  \
 *                                                                      *\n  \
 *  \033[32m3. Compile command  \033[0m                                                *\n  \
 *                                                                      *\n  \

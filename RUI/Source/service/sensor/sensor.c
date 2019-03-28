@@ -115,4 +115,18 @@ void sensors_init()
     }
     gps_setup();
 #endif
+
+#ifdef SHTC3_TEST
+    SHTC3_Init();
+#endif
+
+#ifdef LPS22HB_TEST
+
+       ret = lps22hb_twi_init();
+       if(ret < 0)
+       {
+        	NRF_LOG_INFO( "lps22hb_twi_init fail %d\r\n", ret);
+       }
+       	lps22hb_init();
+#endif
 }

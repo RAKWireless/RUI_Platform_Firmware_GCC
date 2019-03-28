@@ -38,6 +38,13 @@
 #if defined(MAX7_TEST)
 #include "gps_max7.h"
 #endif
+#if defined(SHTC3_TEST)
+#include "shtc3.h"
+#endif
+
+#if defined(LS22HB_TEST)
+#include "lps22hb.h"
+#endif
 
 #ifdef LORA_TEST
 #include "radio.h"

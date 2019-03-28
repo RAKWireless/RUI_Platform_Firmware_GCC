@@ -43,6 +43,11 @@ void test_task(void * pvParameter)
         itracker_function.pressure_get(&pressure);
         NRF_LOG_INFO("pressure = %d\r\n",pressure);
 #endif
+
+#ifdef LPS22HB_TEST
+	itracker_function.pressure_get(&pressure);
+        NRF_LOG_INFO("pressure = %d hPa\r\n",pressure);	
+#endif
 #ifdef LIS3DH_TEST
         itracker_function.acceleration_get(&x,&y,&z);
         NRF_LOG_INFO("acceleration x,y,z = %d mg,%d mg,%d mg",x,y,z);
@@ -70,7 +75,7 @@ void test_task(void * pvParameter)
 
 #endif
 
-#ifdef SHT31_TEST 
+#if defined(SHT31_TEST) || defined(SHTC3_TEST)
            itracker_function.temperature_get(&temp);
            NRF_LOG_INFO("temperature = %d\r\n",temp);
            itracker_function.humidity_get(&humidity);
