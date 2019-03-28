@@ -3,7 +3,8 @@
 Update log 2019.3.28
   
 1. Add two sensors according to our new product Rak5010 based nRF52840
-
+2. nRF52840 uses new version sdk: nRF5_SDK_15.2.0_9412b96 and softdevice s140_nrf52_6.1.1_softdevice.hex in build/hex/, so do not use nRF5_SDK_15.0.0_a53641a for nRF52832
+3. Rak5010 based nRF52840 inherit all features in RUI
 ***************************************************************************************************************************************
 
 Important update log RUI 2.0!!!!2019.3.21
