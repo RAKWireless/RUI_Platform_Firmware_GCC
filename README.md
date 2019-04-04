@@ -1,5 +1,34 @@
 ***************************************************************************************************************************************
 
+Update log 2019.4.4
+
+815 Lora bug fix, new usage is below:
+
+1.earse all flash with nRFGo studio or Jlink
+
+2.download softdevice
+
+3.download app， after download, disconnect with jlink.
+
+4.remove power supply like battery or usb and then power on moudle, if not config lora parameters, lora task not runs
+
+5.send cmd via ble with:
+
+
+lora_cfg:dev_eui=3739343557376202&app_eui=70B3D57ED0012B56&app_key=5AF36B8EBFE9D3336CF15314D3D0357E&dev_addr=26021619&nwkskey=A9F2F04E74966706D52FE5AEFDCCE66A&appskey=16438F8AAE73B5E21890FEC916BBDC04
+
+
+(use your node replace the data, no use, no change)
+
+
+6.when config successful, it will reset automatically and connect to your server
+
+7.after connect, it will send sensors data to server
+
+8.if change node parameters, repeat 1-7
+
+***************************************************************************************************************************************
+
 Update log 2019.3.28
   
 1. Add two sensors according to our new product Rak5010 based nRF52840
