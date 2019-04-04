@@ -71,6 +71,9 @@ typedef struct {
 } lora_cfg_t;
 
 
+#define LORA_CONFIG_MAGIC  	0xAB
+
+
 /*!
  * Generic definition
  */

@@ -21,7 +21,8 @@
 #endif
 #include "hal_uart.h"
 
-
+double gps_lat = 0;
+double gps_lon = 0;   
 #ifdef LORA_TEST
 uint32_t lora_send(uint8_t *cmd);
 #endif
@@ -247,8 +248,7 @@ void Gsm_wait_response(uint8_t *rsp, uint32_t len, uint32_t timeout,GSM_RECEIVE_
 extern uint8_t GpsDataBuffer[512];
 uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
 {   
-        double lat = 0;
-        double lon = 0;    
+ 
         if(data == NULL || len < 0)
         {
                return 1;
@@ -257,12 +257,10 @@ uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
         Max7GpsReadDataStream();
         NRF_LOG_INFO( "gps: %s\r\n", GpsDataBuffer);
         memcpy(data,GpsDataBuffer,128);
-       // if (GpsParseGpsData(GpsDataBuffer, 512))
-       //  {
-       //     GpsGetLatestGpsPositionDouble(&lat, &lon);
-       // }
-
-       //   sprintf(data,"lat=%f , lot=%f \r\n",lat,lon);
+        if (GpsParseGpsData(GpsDataBuffer, 512))
+        {
+            GpsGetLatestGpsPositionDouble(&gps_lat, &gps_lon);
+        }
 }
 #endif
 void itracker_function_init()

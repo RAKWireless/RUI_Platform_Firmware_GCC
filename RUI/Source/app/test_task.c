@@ -12,13 +12,21 @@
 
 #ifdef LORA_TEST
 extern uint8_t JOIN_FLAG;
+extern lora_cfg_t g_lora_cfg_t;
 int lora_send_ok = 0;
 #endif
+
+extern double gps_lat;
+extern double gps_lon;  
 
 void test_task(void * pvParameter)
 {
     uint8_t gps_rsp[128] = {0};
     uint8_t gsm_rsp[128] = {0};
+    uint8_t lora_data[128] = {0};
+    uint8_t lora_len_acc = 0;
+    uint8_t lora_len_t_h = 0;
+    uint8_t lora_len_gps = 0;
     double temp = 0;
     double humidity = 0;
     double pressure = 0;
@@ -29,8 +37,14 @@ void test_task(void * pvParameter)
     float magnetic_y = 0;
     float magnetic_z = 0;
     float light = 0;
+    double lat = 0;
+    double lon = 0;
 #ifdef LORA_TEST
-    region_init();
+    if(g_lora_cfg_t.sof == LORA_CONFIG_MAGIC)
+    {
+       region_init();
+    }
+
 #endif
     while(1)
     {
@@ -85,8 +99,15 @@ void test_task(void * pvParameter)
 #ifdef LORA_TEST
         if(JOIN_FLAG==1)
         {
-            itracker_function.communicate_send("123456");
-            lora_send_ok = 1;
+            memset(lora_data,0,128);
+            lora_len_acc = 0;
+            lora_len_t_h = 0;
+            lora_len_gps = 0;
+            lora_len_acc = sprintf(lora_data,"A:%d,%d,%d;",x,y,z);
+            lora_len_t_h = sprintf(lora_data+lora_len_acc,"T:%d;H:%d;",temp,humidity);
+            lora_len_gps = sprintf(lora_data+lora_len_acc+lora_len_t_h,"G:%d,%d;",gps_lat,gps_lon);            
+            itracker_function.communicate_send(lora_data);
+            lora_send_ok = 1; 
         }
         
 #endif

@@ -237,6 +237,7 @@ void write_lora_config(void)
     delay_ms(10);
     nrf_nvmc_page_erase(LORA_CONFIG_START_ADDRESS);
     delay_ms(100);
+    g_lora_cfg_t.sof = LORA_CONFIG_MAGIC;
     nrf_nvmc_write_bytes(LORA_CONFIG_START_ADDRESS,(uint8_t*)&g_lora_cfg_t,sizeof(g_lora_cfg_t));
     delay_ms(100);
     reset_handle();
