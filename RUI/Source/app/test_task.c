@@ -104,8 +104,8 @@ void test_task(void * pvParameter)
             lora_len_t_h = 0;
             lora_len_gps = 0;
             lora_len_acc = sprintf(lora_data,"A:%d,%d,%d;",x,y,z);
-            lora_len_t_h = sprintf(lora_data+lora_len_acc,"T:%d;H:%d;",temp,humidity);
-            lora_len_gps = sprintf(lora_data+lora_len_acc+lora_len_t_h,"G:%d,%d;",gps_lat,gps_lon);            
+            lora_len_t_h = sprintf(lora_data+lora_len_acc,"T:%d;H:%d;",(int)temp,(int)humidity);
+            lora_len_gps = sprintf(lora_data+lora_len_acc+lora_len_t_h,"G:%d,%d;",(int)gps_lat,(int)gps_lon);            
             itracker_function.communicate_send(lora_data);
             lora_send_ok = 1; 
         }
