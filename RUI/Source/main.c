@@ -169,6 +169,26 @@ void lora_task(void * pvParameter)
 
 #endif
 
+#ifdef MAX7_TEST
+
+extern double gps_lat;
+extern double gps_lon;   
+extern uint8_t GpsDataBuffer[512];
+void gps_task(void * pvParameter)
+{
+    while(1)
+    { 
+           Max7GpsReadDataStream();
+           if (GpsParseGpsData(GpsDataBuffer, 512))
+           {
+               GpsGetLatestGpsPositionDouble(&gps_lat, &gps_lon);
+           }
+         vTaskDelay(500);
+    }
+
+}
+
+#endif
 
 #ifdef DFU_TEST
 //dfu task
@@ -886,6 +906,10 @@ int main(void)
     xReturned = xTaskCreate(lora_task, "lora", 256, NULL, 1, NULL);
    //test task
 
+#endif
+
+#ifdef MAX7_TEST
+    xReturned = xTaskCreate(gps_task, "gps", 128, NULL, 1, NULL);
 #endif
 
 

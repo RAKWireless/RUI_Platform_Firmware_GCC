@@ -253,14 +253,8 @@ uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
         {
                return 1;
         }
+	sprintf(data,"gps: lat = %lf, lon = %lf\r\n",gps_lat,gps_lon);
 
-        Max7GpsReadDataStream();
-        NRF_LOG_INFO( "gps: %s\r\n", GpsDataBuffer);
-        memcpy(data,GpsDataBuffer,128);
-        if (GpsParseGpsData(GpsDataBuffer, 512))
-        {
-            GpsGetLatestGpsPositionDouble(&gps_lat, &gps_lon);
-        }
 }
 #endif
 void itracker_function_init()
