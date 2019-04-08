@@ -363,6 +363,8 @@ TimerTime_t TimerTempCompensation( TimerTime_t period, float temperature );
 void GpioDeinit( Gpio_t *obj );
 void delay_ms(uint32_t ms);
 void power_save_open();
+void power_save_close();
 void lora_init();
 
+void power_manage(void);
 #endif

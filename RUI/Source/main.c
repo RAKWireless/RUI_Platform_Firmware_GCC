@@ -217,10 +217,11 @@ static void advertising_start()
 
 /**@brief Function for placing the application in low power state while waiting for events.
  */
-static void power_manage(void)
+void power_manage(void)
 {
-    uint32_t err_code = sd_app_evt_wait();
-    APP_ERROR_CHECK(err_code);
+    power_release_gpio();
+    __WFI();
+    __WFE();
 }
 /**@brief A function which is hooked to idle task.
  * @note Idle hook must be enabled in FreeRTOS configuration (configUSE_IDLE_HOOK).
@@ -231,13 +232,16 @@ void vApplicationIdleHook( void )
     {
 #ifdef SLEEP_MODE
 #ifdef LORA_TEST
-	if(lora_send_ok==1)
+    if(lora_send_ok == 1)
         {
-             (void)sd_power_system_off();
+            __WFI();
+            __WFE();
         }
 #else
-	(void)sd_power_system_off();
+    __WFI();
+    __WFE();
 #endif
+
 #endif
     }
 }
@@ -873,7 +877,7 @@ int main(void)
 
     // Activate deep sleep mode.
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-
+    NRF_POWER->DCDCEN = 1;
     ble_stack_init();
     timers_init();
     gap_params_init();

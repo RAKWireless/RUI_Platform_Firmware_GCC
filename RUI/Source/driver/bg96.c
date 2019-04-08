@@ -128,7 +128,7 @@ int Gsm_WaitRspOK(char *rsp_value, uint16_t timeout_ms, uint8_t is_rf)
             }
 
             rsp_value[i++] = (char)c;
-            SEGGER_RTT_printf(0, "%02X", rsp_value[i - 1]);
+            //NRF_LOG_INFO("%02X", rsp_value[i - 1]);
             time_count--;
         }
         while(time_count > 0);
@@ -147,7 +147,7 @@ int Gsm_WaitRspOK(char *rsp_value, uint16_t timeout_ms, uint8_t is_rf)
                 continue;
             }
             //R485_UART_TxBuf((uint8_t *)&c,1);
-            SEGGER_RTT_printf(0, "%c", c);
+            //NRF_LOG_INFO("%c", c);
             GSM_RSP[i++] = (char)c;
 
             if(i >= wait_len)
@@ -440,7 +440,7 @@ void Gsm_nb_iot_config(void)
 
     //open a socket of tcp as a server listener because only listener can recieve update file
 #endif
-#if 1
+#if 0
     Gsm_print("AT+COPS=?");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 400, true);
@@ -807,16 +807,17 @@ int Gsm_Init()
     /*check SIM Card status,if not ready,retry 60s,return*/
     time_count = 0;
     gps_config();
-    while((Gsm_CheckSimCmd() < 0))
-    {
-        delay_ms(GSM_CHECKSIM_RETRY_TIME);
+    delay_ms(1000);
+    //while((Gsm_CheckSimCmd() < 0))
+    //{
+    //    delay_ms(GSM_CHECKSIM_RETRY_TIME);
 
-        if(++time_count > GSM_CHECKSIM_RETRY_NUM)
-        {
-            DPRINTF(LOG_WARN, "check sim card timeout\r\n");
-            return -1;
-        }
-    }
+    //    if(++time_count > GSM_CHECKSIM_RETRY_NUM)
+    //    {
+    //        DPRINTF(LOG_WARN, "check sim card timeout\r\n");
+    //        return -1;
+    //    }
+    //}
 
     //NRF_LOG_INFO("Test with Hologram on China Telecom\r\n");
 

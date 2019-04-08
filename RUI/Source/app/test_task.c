@@ -49,6 +49,7 @@ void test_task(void * pvParameter)
     while(1)
     {
         NRF_LOG_INFO("++++++++++++++++test begin++++++++++++++++\r\n");
+        power_save_close();
 #ifdef BEM280_TEST
         itracker_function.temperature_get(&temp);
         NRF_LOG_INFO("temperature = %d\r\n",temp);
@@ -80,6 +81,7 @@ void test_task(void * pvParameter)
         itracker_function.communicate_send("ATI");
         memset(gsm_rsp,0,128);
         itracker_function.communicate_response(gsm_rsp,128,500,GSM_TYPE_CHAR);
+		NRF_LOG_INFO("gps info :%s\r\n",gsm_rsp);
 #endif
 #if defined(L70R_TEST) ||  defined(BG96_TEST) || defined(MAX7_TEST)
 
@@ -111,10 +113,10 @@ void test_task(void * pvParameter)
         }
         
 #endif
-#ifdef SLEEP_MODE
+#if defined(SLEEP_MODE) && !defined(LORA_TEST)
         power_save_open();
 #endif
         NRF_LOG_INFO("++++++++++++++++test end++++++++++++++++\r\n");
-        vTaskDelay(5000);
+        vTaskDelay(10000);
     }
 }

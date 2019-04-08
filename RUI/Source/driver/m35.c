@@ -140,7 +140,7 @@ int Gsm_WaitRspOK(char *rsp_value, uint16_t timeout_ms, uint8_t is_rf)
             }
 
             rsp_value[i++] = (char)c;
-            SEGGER_RTT_printf(0, "%02X", rsp_value[i - 1]);
+            //NRF_LOG_INFO("%02X", rsp_value[i - 1]);
             time_count--;
         }
         while(time_count > 0);
@@ -159,7 +159,7 @@ int Gsm_WaitRspOK(char *rsp_value, uint16_t timeout_ms, uint8_t is_rf)
                 continue;
             }
             //R485_UART_TxBuf((uint8_t *)&c,1);
-            SEGGER_RTT_printf(0, "%c", c);
+            //NRF_LOG_INFO("%c", c);
             GSM_RSP[i++] = (char)c;
 
             if(i >= wait_len)
