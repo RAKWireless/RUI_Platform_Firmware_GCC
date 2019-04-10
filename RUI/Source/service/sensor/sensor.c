@@ -52,8 +52,7 @@ void sensors_init()
     }
 #endif
 #ifdef LIS3DH_TEST
-    //config interrupt
-    nrf_gpio_cfg_sense_input(LIS3DH_INT1_PIN, NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_HIGH);    
+    //config interrupt   
     ret = lis3dh_twi_init();
     if(ret != NRF_SUCCESS)
     {
