@@ -23,6 +23,27 @@
 #include "hal_uart.h"
 #include "pin_define.h"
 
+#ifdef BEM280_TEST
+#include "bme280.h"
+#endif
+
+#ifdef OPT3001_TEST
+#include "opt3001.h"
+#endif
+
+#ifdef LIS2MDL_TEST
+#include "lis2mdl.h"
+#endif
+#ifdef LIS3DH_TEST
+#include "lis3dh.h"
+#endif
+#ifdef SHTC3_TEST
+#include "shtc3.h"
+#endif
+
+#ifdef SHT31_TEST
+#include "sht31.h"
+#endif
 #if defined(BG96_TEST)
 #include "bg96.h"
 #endif

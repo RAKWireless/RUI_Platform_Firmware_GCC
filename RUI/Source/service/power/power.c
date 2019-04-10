@@ -43,6 +43,28 @@ void power_save_open()
 #ifdef MAX7_TEST
     gps_poweroff();
 #endif
+#ifdef BEM280_TEST
+    bme280_spi_init();
+    _bme280_sleep_init();
+#endif
+
+#ifdef OPT3001_TEST
+    opt3001_twi_init();
+    sensorOpt3001Enable(0);
+#endif
+
+#ifdef LIS2MDL_TEST
+    lis2mdl_twi_init();
+    lis2mdl_sleep_init();
+#endif
+#ifdef LIS3DH_TEST  
+    lis3dh_twi_init();
+    lis3dh_sleep_init();
+#endif
+#ifdef SHTC3_TEST
+    SHTC3_Init();
+    SHTC3_Sleep();
+#endif
 
 #ifdef LORA_TEST
     if(lora_send_ok == 1)
@@ -67,6 +89,7 @@ void power_save_close()
        max_init();
        gps_setup();
 #endif
+       sensors_init();
         POWER_SAVE_ON = 0;
     }
 }
