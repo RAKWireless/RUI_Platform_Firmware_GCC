@@ -1,5 +1,12 @@
 ***************************************************************************************************************************************
 
+Update log 2019.4.10
+
+1.Power optimize on itracker. Moudle wakes up per 10s and do some work. not waken by acc any more. Now it is 1.05mA in sleep mode.
+The power consumption of Rak815 exsits some problem and will be fixed in future.
+
+***************************************************************************************************************************************
+
 Update log 2019.4.8
 
 1.Rak 815 lora node gps bug fixed
