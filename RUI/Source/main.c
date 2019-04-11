@@ -174,18 +174,31 @@ void lora_task(void * pvParameter)
 extern double gps_lat;
 extern double gps_lon;   
 extern uint8_t GpsDataBuffer[512];
+TaskHandle_t xTaskGps;
+
 void gps_task(void * pvParameter)
 {
+    static uint8_t count = 10;
     while(1)
     { 
-           Max7GpsReadDataStream();
-           if (GpsParseGpsData(GpsDataBuffer, 512))
-           {
-               GpsGetLatestGpsPositionDouble(&gps_lat, &gps_lon);
-           }
-         vTaskDelay(500);
+    	  if(count > 1)
+          {
+	          Max7GpsReadDataStream();
+	          NRF_LOG_INFO("GpsDataBuffer =\r\n%s\r\n",GpsDataBuffer);
+	          if (GpsParseGpsData(GpsDataBuffer, 512))
+	          {
+	                GpsGetLatestGpsPositionDouble(&gps_lat, &gps_lon);
+	          }
+	          count--;
+	          vTaskDelay(100); 
+          }
+          else
+          {
+          	count = 10;
+		vTaskSuspend(NULL);
+          }
+          
     }
-
 }
 
 #endif
@@ -913,7 +926,7 @@ int main(void)
 #endif
 
 #ifdef MAX7_TEST
-    xReturned = xTaskCreate(gps_task, "gps", 128, NULL, 1, NULL);
+    xReturned = xTaskCreate(gps_task, "gps", 128, NULL, 1, &xTaskGps);
 #endif
 
 

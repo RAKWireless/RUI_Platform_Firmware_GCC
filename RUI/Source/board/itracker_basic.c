@@ -246,6 +246,7 @@ void Gsm_wait_response(uint8_t *rsp, uint32_t len, uint32_t timeout,GSM_RECEIVE_
 
 #ifdef MAX7_TEST
 extern uint8_t GpsDataBuffer[512];
+extern TaskHandle_t xTaskGps;
 uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
 {   
  
@@ -253,6 +254,7 @@ uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
         {
                return 1;
         }
+       vTaskResume(xTaskGps);
 	sprintf(data,"gps: lat = %lf, lon = %lf\r\n",gps_lat,gps_lon);
 
 }

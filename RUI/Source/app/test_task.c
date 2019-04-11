@@ -87,6 +87,7 @@ void test_task(void * pvParameter)
 
         memset(gps_rsp,0,128);
         itracker_function.gps_get(gps_rsp,128);
+        vTaskDelay(2000);
         NRF_LOG_INFO("gps info :%s\r\n",gps_rsp);
 
 #endif
@@ -117,6 +118,6 @@ void test_task(void * pvParameter)
         power_save_open();
 #endif
         NRF_LOG_INFO("++++++++++++++++test end++++++++++++++++\r\n");
-        vTaskDelay(10000);
+        vTaskDelay(20000);
     }
 }
