@@ -184,7 +184,7 @@ void gps_task(void * pvParameter)
     	  if(count > 1)
           {
 	          Max7GpsReadDataStream();
-	          NRF_LOG_INFO("GpsDataBuffer =\r\n%s\r\n",GpsDataBuffer);
+	          //NRF_LOG_INFO("GpsDataBuffer =\r\n%s\r\n",GpsDataBuffer);
 	          if (GpsParseGpsData(GpsDataBuffer, 512))
 	          {
 	                GpsGetLatestGpsPositionDouble(&gps_lat, &gps_lon);
