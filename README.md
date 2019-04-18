@@ -2,7 +2,7 @@
 
 Update log 2019.4.18
 
-1.Power optimize on itracker. Moudle wakes up per 10s and do some work. not waken by acc any more. Now it is 1.05mA in sleep mode.
+1.Power optimize on itracker. Moudle wakes up per 10s and do some work. not waken by acc any more. Now it is 0.9mA in sleep mode.
 
 ***************************************************************************************************************************************
 
