@@ -73,11 +73,13 @@ void power_save_open()
     }
 #endif
 	app_uart_close();
+    *(volatile uint32_t *)0x40002FFC = 0;
 }
 void power_save_close()
 {
 	if(POWER_SAVE_ON == 1)
 	{
+	 *(volatile uint32_t *)0x40002FFC = 1;
     	NRF_LOG_INFO("power save close!\r\n");
 #if defined(BC95G_TEST) || defined(M35_TEST) || defined(BG96_TEST)
     	Gsm_Init();
