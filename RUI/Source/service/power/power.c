@@ -72,6 +72,7 @@ void power_save_open()
    	 SX1276SetSleep( );
     }
 #endif
+	app_uart_close();
 }
 void power_save_close()
 {
