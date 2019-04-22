@@ -440,39 +440,36 @@ void Gsm_nb_iot_config(void)
 
     //open a socket of tcp as a server listener because only listener can recieve update file
 #endif
-#if 0
+#if 1
     Gsm_print("AT+COPS=?");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
-    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 400, true);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 120, true);
+    NRF_LOG_INFO("AT+COPS=? %s\r\n",GSM_RSP);
     delay_ms(1000);
     Gsm_print("AT+COPS=1,0,\"CHINA MOBILE\",0");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
+    NRF_LOG_INFO("AT+COPS=1 %s\r\n",GSM_RSP);
     delay_ms(1000);
     Gsm_print("AT+QNWINFO");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 4, true);
+    NRF_LOG_INFO("AT+QNWINFO %s\r\n",GSM_RSP);    
     delay_ms(1000);
     Gsm_print("AT+QICSGP=1,1,\"CMCC\","","",1");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
+    NRF_LOG_INFO("AT+QICSGP=1 %s\r\n",GSM_RSP);
     delay_ms(1000);
     Gsm_print("AT+QIACT=1");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
+    NRF_LOG_INFO("AT+QIACT=1 %s\r\n",GSM_RSP);    
     delay_ms(1000);
     Gsm_print("AT+QIACT?");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
-    delay_ms(1000);
-    Gsm_print("AT+QIOPEN=1,1,\"TCP LISTENER\",\"127.0.0.1\",0,2020,0");
-    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
-    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
-    delay_ms(1000);
-    Gsm_print("AT+QISTATE");
-    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
-    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
-    NRF_LOG_INFO("AT+QISTATE GSM_RSP = %s\r\n", GSM_RSP);
+    NRF_LOG_INFO("AT+QIACT? %s\r\n",GSM_RSP); 
     delay_ms(1000);
 #endif
 }
@@ -557,135 +554,72 @@ void gsm_send_test(void)
 int Gsm_test_hologram(void)
 {
     int ret = -1;
-    int time_count;
-    int cmd_len;
-    int retry_count;
-
+    NRF_LOG_INFO("Gsm_test_hologram begin\r\n");
+    Gsm_print("ATI");
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 120, true);
+    NRF_LOG_INFO("ATI %s\r\n",GSM_RSP);
+    delay_ms(1000);
     Gsm_print("AT+COPS=?");
-    ret = Gsm_WaitRspOK(NULL, GSM_GENER_CMD_TIMEOUT, true);
-    vTaskDelay(300);
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 120, true);
+    NRF_LOG_INFO("AT+COPS=? %s\r\n",GSM_RSP);
+    delay_ms(1000);
 
     Gsm_print("AT+COPS=1,0,\"CHINA MOBILE\",0");
-    ret = Gsm_WaitRspOK(NULL, GSM_GENER_CMD_TIMEOUT, true);
-    vTaskDelay(300);
-
-    while((Gsm_CheckNetworkCmd() < 0))
-    {
-        //delay_ms(GSM_CHECKSIM_RETRY_TIME);
-        vTaskDelay(300);
-        if(++time_count > GSM_CHECKSIM_RETRY_NUM)
-        {
-            DPRINTF(LOG_WARN, "check network timeout\r\n");
-            return -1;
-        }
-    }
-
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
+    NRF_LOG_INFO("AT+COPS=1,0,\"CHINA MOBILE\",0 %s\r\n",GSM_RSP);
+    delay_ms(1000);
+    Gsm_print("AT+CREG?");
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
+    NRF_LOG_INFO("AT+CREG? %s\r\n",GSM_RSP);
+    delay_ms(1000);
     Gsm_print("AT+QNWINFO");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 4, true);
-    if(ret >= 0)
-    {
-        NRF_LOG_INFO( "Wait +QNWINFO RSP!\n");
-        if(NULL != strstr(GSM_RSP, "+QNWINFO: \"EDGE\""))
-        {
-            ret = 0;
-        }
-        else
-        {
-            ret = -1;
-        }
-    }
-    vTaskDelay(300);
-
+    NRF_LOG_INFO("AT+QNWINFO %s\r\n",GSM_RSP);
+    delay_ms(1000);
     Gsm_print("AT+COPS?");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
-    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT, true);
-    if(ret >= 0)
-    {
-        if(NULL != strstr(GSM_RSP, "Hologram"))
-        {
-            ret = 0;
-        }
-        else
-        {
-            ret = -1;
-        }
-    }
-    vTaskDelay(300);
-
-    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 4, true);
+    NRF_LOG_INFO("AT+COPS? %s\r\n",GSM_RSP);
+    delay_ms(1000);
     Gsm_print("AT+QICSGP=1,1,\"hologram\",\"\",\"\",1");
-    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT, true);
-    vTaskDelay(300);
-
-
-    Gsm_print("AT+QIACT=1");
-    ret = Gsm_WaitRspOK(NULL, GSM_GENER_CMD_TIMEOUT * 4, true);
-    NRF_LOG_INFO( "AT+QIACT=1\n");
-    vTaskDelay(300);
-
-
-    retry_count = 3;
-    do
-    {
-        retry_count--;
-        Gsm_print("AT+QIACT?");
-        memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
-        ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT, true);
-        if(ret >= 0)
-        {
-            if(NULL != strstr(GSM_RSP, "+QIACT: 1,1,1"))
-            {
-                ret = 0;
-            }
-            else
-            {
-                ret = -1;
-            }
-        }
-    }
-    while(retry_count && ret);
-    vTaskDelay(100);
-
-    retry_count = 3;
-    do
-    {
-        retry_count--;
-        Gsm_print("AT+QIOPEN=1,0,\"TCP\",\"cloudsocket.hologram.io\",9999,0,1");
-        memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
-        ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT, true);
-    }
-    while(retry_count && ret);
-    vTaskDelay(300);
-
-    retry_count = 2;
-    do
-    {
-        retry_count--;
-        Gsm_print("AT+QISEND=0,48");
-        ret = Gsm_WaitSendAck(GSM_GENER_CMD_TIMEOUT);
-    }
-    while(retry_count && ret);
-    vTaskDelay(300);
-    if(ret == 0)
-    {
-        NRF_LOG_INFO( "------GSM_SEND_DATA\n");
-        Gsm_print("{\"k\":\"+C7pOb8=\",\"d\":\"Hello,World!\",\"t\":\"TOPIC1\"}");
-    }
-
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
-    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT, true);
-    if(ret >= 0)
-    {
-        if(NULL != strstr(GSM_RSP, "SEND OK"))
-        {
-            ret = 0;
-        }
-        else
-        {
-            ret = -1;
-        }
-    }
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 10, true);
+    NRF_LOG_INFO("AT+QICSGP= %s\r\n",GSM_RSP);
+    delay_ms(1000);
+    Gsm_print("AT+QIACT=1");
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 120, true);
+    NRF_LOG_INFO("AT+QIACT=1 %s\r\n",GSM_RSP);
+    delay_ms(1000);
+    Gsm_print("AT+QIACT?");
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
+    NRF_LOG_INFO("AT+QIACT? %s\r\n",GSM_RSP);
+    delay_ms(1000);
+    Gsm_print("AT+QIOPEN=1,0,\"TCP\",\"cloudsocket.hologram.io\",9999,0,1");
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 60, true);
+    NRF_LOG_INFO("AT+QIOPEN=1,0,\"TCP\",\"cloudsocket.hologram.io\",9999,0,1 %s\r\n",GSM_RSP);
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 20, true);
+    NRF_LOG_INFO("%s\r\n",GSM_RSP);
+    delay_ms(1000);
+    Gsm_print("AT+QISEND=0,48");
+    delay_ms(1000);
+    Gsm_print("{\"k\":\"+C7pOb8=\",\"d\":\"Hello,World!\",\"t\":\"TOPIC1\"}");
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT *60, true);
+    NRF_LOG_INFO("%s\r\n",GSM_RSP);
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT *80, true);
+    NRF_LOG_INFO("%s\r\n",GSM_RSP);
+    Gsm_print("AT+QICLOSE=0");
+    delay_ms(5000);
     return ret;
 }
 
@@ -808,25 +742,9 @@ int Gsm_Init()
     time_count = 0;
     gps_config();
     delay_ms(1000);
-    //while((Gsm_CheckSimCmd() < 0))
-    //{
-    //    delay_ms(GSM_CHECKSIM_RETRY_TIME);
-
-    //    if(++time_count > GSM_CHECKSIM_RETRY_NUM)
-    //    {
-    //        DPRINTF(LOG_WARN, "check sim card timeout\r\n");
-    //        return -1;
-    //    }
-    //}
-
-    //NRF_LOG_INFO("Test with Hologram on China Telecom\r\n");
-
-    //time_count=0;
-    //Gsm_test_hologram();
-    /*config NB-IOT param, this test is based China Telecom,if not success, contact your operator.
-      The detail of command can refer to  Quectel document https://www.quectel.com/support/ */
+#ifdef ACCESS_NET_TEST
     Gsm_nb_iot_config();
-
+#endif
     return 0;
 }
 /**

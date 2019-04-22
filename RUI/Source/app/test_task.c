@@ -19,6 +19,7 @@ int lora_send_ok = 0;
 extern double gps_lat;
 extern double gps_lon;  
 
+#ifndef ACCESS_NET_TEST
 void test_task(void * pvParameter)
 {
     uint8_t gps_rsp[128] = {0};
@@ -121,3 +122,22 @@ void test_task(void * pvParameter)
         vTaskDelay(20000);
     }
 }
+
+
+#else
+
+void test_task(void * pvParameter)
+{
+    uint8_t gsm_rsp[500] = {0};
+
+    while(1)
+    {
+        itracker_function.communicate_send("AT+QPING=1,\"www.baidu.com\"");
+        memset(gsm_rsp, 0, 500);
+        itracker_function.communicate_response(gsm_rsp, 500, 500 * 60, GSM_TYPE_CHAR);
+        NRF_LOG_INFO("connect to www.baidu.com:\r\n %s\r\n",gsm_rsp);
+        vTaskDelay(10000);
+    }
+}
+
+#endif

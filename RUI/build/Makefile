@@ -408,6 +408,10 @@ endif
 ifeq (1, $(SLEEP_MODE))
    CFLAGS += -DSLEEP_MODE
 endif
+ifeq (1, $(ACCESS_NET_TEST))
+   CFLAGS += -DACCESS_NET_TEST
+endif
+
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -DSWI_DISABLE0
 CFLAGS += -mcpu=cortex-m4

@@ -9,3 +9,7 @@ REGION = 0
 #Part 2 sleep mode
 #0------off      1------on
 SLEEP_MODE = 0
+
+#part 3 nb-iot test
+#0------off      1------on
+ACCESS_NET_TEST = 0
