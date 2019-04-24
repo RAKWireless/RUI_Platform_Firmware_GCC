@@ -200,7 +200,7 @@ uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
 
     return ret;
 }
-
+extern char GSM_RSP[1600];
 void Gsm_wait_response(uint8_t *rsp, uint32_t len, uint32_t timeout,GSM_RECEIVE_TYPE type)
 {
     if(rsp == NULL || len < 0)
@@ -208,7 +208,9 @@ void Gsm_wait_response(uint8_t *rsp, uint32_t len, uint32_t timeout,GSM_RECEIVE_
         return;
     }
     g_type = type;
-    Gsm_WaitRspOK(rsp, timeout, true);
+    memset(GSM_RSP, 0, 1600);
+    Gsm_WaitRspOK(GSM_RSP, timeout, true);
+    NRF_LOG_INFO("%s\r\n",GSM_RSP);
 }
 #endif
 #ifdef L70R_TEST

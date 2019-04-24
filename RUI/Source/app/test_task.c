@@ -135,19 +135,15 @@ void nb_iot_task(void * pvParameter)
             {
                 memset(rsp, 0, 500);
                 itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
-                NRF_LOG_INFO("%s\r\n",rsp);
                 memset(rsp, 0, 500);
-                itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
-                NRF_LOG_INFO("%s\r\n",rsp);
+                itracker_function.communicate_response(rsp, 500, 500 * 30, GSM_TYPE_CHAR);
             }
             else if(strstr(cmd,"Hello,World!")!= NULL)
             {
                 memset(rsp, 0, 500);
                 itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
-                NRF_LOG_INFO("%s\r\n",rsp);
                 memset(rsp, 0, 500);
                 itracker_function.communicate_response(rsp, 500, 500 * 80, GSM_TYPE_CHAR);
-                NRF_LOG_INFO("%s\r\n",rsp);  
             }
             else if (strstr(cmd,"AT+QISEND")!= NULL)
             {
@@ -157,7 +153,6 @@ void nb_iot_task(void * pvParameter)
             {
                 memset(rsp, 0, 500);
                 itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
-                NRF_LOG_INFO("%s\r\n",rsp);
             }
 
             memset(cmd,0,128);

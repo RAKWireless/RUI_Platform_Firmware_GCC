@@ -146,11 +146,10 @@ int Gsm_WaitRspOK(char *rsp_value, uint16_t timeout_ms, uint8_t is_rf)
                 delay_ms(1);
                 continue;
             }
-            //R485_UART_TxBuf((uint8_t *)&c,1);
-            //NRF_LOG_INFO("%c", c);
+
             GSM_RSP[i++] = (char)c;
 
-            if(i >= wait_len)
+            if(i >= 0 && rsp_value != NULL)
             {
                 if(is_rf)
                     cmp_p = strstr(GSM_RSP, GSM_CMD_RSP_OK_RF);
@@ -161,7 +160,7 @@ int Gsm_WaitRspOK(char *rsp_value, uint16_t timeout_ms, uint8_t is_rf)
                     if(i > wait_len && rsp_value != NULL)
                     {
                         //SEGGER_RTT_printf(0,"--%s  len=%d\r\n", rsp_value, i);
-                        memcpy(rsp_value, GSM_RSP, i);//(cmp_p - GSM_RSP));
+                        memcpy(rsp_value, GSM_RSP, i);
                     }
                     ret = 0;
                     break;
@@ -571,7 +570,6 @@ int Gsm_test_hologram(void)
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 120, true);
     NRF_LOG_INFO("AT+COPS=? %s\r\n",GSM_RSP);
     delay_ms(1000);
-
     Gsm_print("AT+COPS=1,0,\"CHINA MOBILE\",0");
     memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);

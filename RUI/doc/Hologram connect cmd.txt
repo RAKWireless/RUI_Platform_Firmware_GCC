@@ -24,7 +24,7 @@ All cmd will responce once in RTT log viewer, except below:
    this cmd will responce twice, so send next after recieving two responces.
 2. AT+QISEND=0,48	
    after send this, no responce, just send next directly.
-  
+3. When send cmd, must wait for the responce of previous cmd
 
 If send failed, repeat from 10. More details is in RUI With Hologram.io V1.0.
 Ble tool is recommended to use nnRF Connect by nordic.
