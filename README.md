@@ -1,5 +1,11 @@
 ***************************************************************************************************************************************
 
+Update log 2019.4.24
+
+1.NB-IOT test with Hologram. If want to use it, turn on ACCESS_NET_TEST in Makefile_Custome and compile. Then send cmd via ble by nRF connect on phone to test the hologram. More details are in RUI\doc\. 
+
+***************************************************************************************************************************************
+
 Update log 2019.4.22
 
 1.NB-IOT test with CHINA MOBILE.
