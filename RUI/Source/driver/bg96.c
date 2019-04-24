@@ -160,8 +160,8 @@ int Gsm_WaitRspOK(char *rsp_value, uint16_t timeout_ms, uint8_t is_rf)
                 {
                     if(i > wait_len && rsp_value != NULL)
                     {
-                        //SEGGER_RTT_printf(0,"--%s  len=%d\r\n", resp, (cmp_p-resp));
-                        memcpy(rsp_value, GSM_RSP, (cmp_p - GSM_RSP));
+                        //SEGGER_RTT_printf(0,"--%s  len=%d\r\n", rsp_value, i);
+                        memcpy(rsp_value, GSM_RSP, i);//(cmp_p - GSM_RSP));
                     }
                     ret = 0;
                     break;
@@ -471,6 +471,12 @@ void Gsm_nb_iot_config(void)
     ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
     NRF_LOG_INFO("AT+QIACT? %s\r\n",GSM_RSP); 
     delay_ms(1000);
+    Gsm_print("AT+QPING=1,\"www.baidu.com\"");
+    memset(GSM_RSP, 0, GSM_GENER_CMD_LEN);
+    ret = Gsm_WaitRspOK(GSM_RSP, GSM_GENER_CMD_TIMEOUT * 40, true);
+    NRF_LOG_INFO("AT+QPING? %s\r\n",GSM_RSP); 
+    delay_ms(1000);
+
 #endif
 }
 
@@ -742,9 +748,6 @@ int Gsm_Init()
     time_count = 0;
     gps_config();
     delay_ms(1000);
-#ifdef ACCESS_NET_TEST
-    Gsm_nb_iot_config();
-#endif
     return 0;
 }
 /**

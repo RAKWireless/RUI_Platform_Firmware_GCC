@@ -106,7 +106,7 @@
 
 #define APP_BLE_OBSERVER_PRIO           1                                           /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 
-#define APP_ADV_INTERVAL                3200                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
+#define APP_ADV_INTERVAL                1600                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS      180                                         /**< The advertising timeout (in units of seconds). */
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(20, UNIT_1_25_MS)             /**< Minimum acceptable connection interval (20 ms), Connection interval uses 1.25 ms units. */
@@ -145,6 +145,12 @@ static ble_uuid_t m_adv_uuids[]          =                                      
 //test task
 extern void test_task(void * pvParameter);
 
+#ifdef ACCESS_NET_TEST
+extern void nb_iot_task(void * pvParameter);
+xSemaphoreHandle xBinarySemaphore_iot = NULL;
+uint8_t cmd[128] = {0};
+#endif
+
 #ifdef LORA_TEST
 uint8_t JOIN_FLAG = 0;  // 0-not connect; 1- connect
 extern int lora_send_ok;
@@ -162,6 +168,7 @@ void lora_task(void * pvParameter)
          {
              SX1276OnDio0Irq();
          }
+         //after getting Semaphore, must call vTaskDelay to excute pendsv
          vTaskDelay(2000);
     }
 
@@ -335,7 +342,7 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
     {
         uint32_t err_code;
 
-        NRF_LOG_DEBUG("Received data from BLE NUS. Writing data on UART.");
+        NRF_LOG_DEBUG("Received data from BLE NUS.");
         NRF_LOG_HEXDUMP_DEBUG(p_evt->params.rx_data.p_data, p_evt->params.rx_data.length);
 #ifdef LORA_TEST
         if(strncmp((char*)p_evt->params.rx_data.p_data, "lora_cfg:", strlen("lora_cfg:")) == 0)
@@ -344,23 +351,20 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
             write_lora_config();
         }
 #endif
-        for (uint32_t i = 0; i < p_evt->params.rx_data.length; i++)
+
+#ifdef ACCESS_NET_TEST
+        memset(cmd,0,128);
+        memcpy(cmd,&(p_evt->params.rx_data.p_data[0]),p_evt->params.rx_data.length);
+        NRF_LOG_DEBUG("cmd = %s\r\n",cmd);
+        static portBASE_TYPE xHigherPriorityTaskWoken;
+        xHigherPriorityTaskWoken = pdFALSE; 
+        xSemaphoreGive( xBinarySemaphore_iot); 
+        //after give the Semaphore,must call portYIELD_FROM_ISR to excute task exchange
+        if(xHigherPriorityTaskWoken == pdTRUE )
         {
-            do
-            {
-                err_code = app_uart_put(p_evt->params.rx_data.p_data[i]);
-                if ((err_code != NRF_SUCCESS) && (err_code != NRF_ERROR_BUSY))
-                {
-                    NRF_LOG_ERROR("Failed receiving NUS message. Error 0x%x. ", err_code);
-                    APP_ERROR_CHECK(err_code);
-                }
-            }
-            while (err_code == NRF_ERROR_BUSY);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         }
-        if (p_evt->params.rx_data.p_data[p_evt->params.rx_data.length - 1] == '\r')
-        {
-            while (app_uart_put('\n') == NRF_ERROR_BUSY);
-        }
+#endif
     }
 
 }
@@ -910,8 +914,7 @@ int main(void)
     // dfu task is the only background task
     xReturned = xTaskCreate(dfu_task, "dfu", 512, NULL, 1, NULL);
 #endif
-    //
-    xReturned = xTaskCreate(test_task, "test", 512, NULL, 2, NULL);
+
 #ifdef LORA_TEST
 
     vSemaphoreCreateBinary(xBinarySemaphore);
@@ -923,6 +926,18 @@ int main(void)
     xReturned = xTaskCreate(lora_task, "lora", 256, NULL, 1, NULL);
    //test task
 
+#endif
+
+#ifdef ACCESS_NET_TEST
+    vSemaphoreCreateBinary(xBinarySemaphore_iot);
+    if(xBinarySemaphore_iot == NULL)
+    {
+        NRF_LOG_INFO("xBinarySemaphore_iot is NULL\r\n");
+    }
+    xReturned = xTaskCreate(nb_iot_task, "nb_iot", 512, NULL, 2, NULL);
+
+#else
+    xReturned = xTaskCreate(test_task, "test", 512, NULL, 2, NULL);
 #endif
 
 #ifdef MAX7_TEST

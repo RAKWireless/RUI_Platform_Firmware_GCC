@@ -1,0 +1,30 @@
+Hologram test at cmd via ble：
+
+1.ATI											//query firmware of NB-IOT chip
+2.AT+COPS=?										//search operator net, it will cost at least 30s
+3.AT+COPS=1,0,"CHINA MOBILE",0					//register to your operator, query your operator whether supports hologram or not
+4.AT+CREG?										//Check whether the device is registered on the network
+5.AT+QNWINFO                       				// Query connected network information
+6.AT+COPS?   									// Query the connected web server information
+7.AT+QICSGP=1,1,"hologram","","",1      		// Set APN network to hologram
+8.AT+QIACT=1 									// Activate the APN network
+9.AT+QIACT? 									// Query the APN assigned IP address
+10.AT+QIOPEN=1,0,"TCP","cloudsocket.hologram.io",9999,0,1   // Create a TCP, connection hologram test server
+11.AT+QISEND=0,48								// Send data, send data length is 48
+12.{"k":"bZmmdbAg","d":"Hello,World!","t":"TOPIC1"} //Send Packets.The data format is a hologram-defined
+format.( For details, please see: https://hologram.io/docs/reference/cloud/embedded/ ), bZmmdbAg should
+be replaced with your card device key.
+13.AT+QISEND=0,0 								// Query data is sent successfully
+14.AT+QICLOSE=0									//close tcp link
+
+
+Notes:
+All cmd will responce once in RTT log viewer, except below:
+1. AT+QIOPEN=1,0,"TCP","cloudsocket.hologram.io",9999,0,1
+   this cmd will responce twice, so send next after recieving two responces.
+2. AT+QISEND=0,48	
+   after send this, no responce, just send next directly.
+  
+
+If send failed, repeat from 10. More details is in RUI With Hologram.io V1.0.
+Ble tool is recommended to use nnRF Connect by nordic.

@@ -16,6 +16,11 @@ extern lora_cfg_t g_lora_cfg_t;
 int lora_send_ok = 0;
 #endif
 
+#if defined(BC95G_TEST) || defined(M35_TEST) || defined(BG96_TEST)
+extern uint8_t cmd[128];
+extern xSemaphoreHandle xBinarySemaphore_iot;
+#endif
+
 extern double gps_lat;
 extern double gps_lon;  
 
@@ -23,7 +28,6 @@ extern double gps_lon;
 void test_task(void * pvParameter)
 {
     uint8_t gps_rsp[128] = {0};
-    uint8_t gsm_rsp[128] = {0};
     uint8_t lora_data[128] = {0};
     uint8_t lora_len_acc = 0;
     uint8_t lora_len_t_h = 0;
@@ -77,13 +81,7 @@ void test_task(void * pvParameter)
         itracker_function.light_strength_get(&light);
         NRF_LOG_INFO("light strength = %d\r\n",light);
 #endif
-#if  defined(M35_TEST) || defined(BG96_TEST)
-        NRF_LOG_INFO("gsm version info = ");
-        itracker_function.communicate_send("ATI");
-        memset(gsm_rsp,0,128);
-        itracker_function.communicate_response(gsm_rsp,128,500,GSM_TYPE_CHAR);
-		NRF_LOG_INFO("gps info :%s\r\n",gsm_rsp);
-#endif
+
 #if defined(L70R_TEST) ||  defined(BG96_TEST) || defined(MAX7_TEST)
 
         memset(gps_rsp,0,128);
@@ -119,25 +117,52 @@ void test_task(void * pvParameter)
         power_save_open();
 #endif
         NRF_LOG_INFO("++++++++++++++++test end++++++++++++++++\r\n");
-        vTaskDelay(20000);
+        vTaskDelay(60000*2);
     }
 }
-
 
 #else
 
-void test_task(void * pvParameter)
+void nb_iot_task(void * pvParameter)
 {
-    uint8_t gsm_rsp[500] = {0};
-
+    uint8_t rsp[500] = {0};
     while(1)
     {
-        itracker_function.communicate_send("AT+QPING=1,\"www.baidu.com\"");
-        memset(gsm_rsp, 0, 500);
-        itracker_function.communicate_response(gsm_rsp, 500, 500 * 60, GSM_TYPE_CHAR);
-        NRF_LOG_INFO("connect to www.baidu.com:\r\n %s\r\n",gsm_rsp);
+        if( xSemaphoreTake( xBinarySemaphore_iot, portMAX_DELAY ) == pdTRUE && cmd[0] != 0)
+        {
+            itracker_function.communicate_send(cmd);
+            if (strstr(cmd,"AT+QIOPEN")!= NULL)
+            {
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
+                NRF_LOG_INFO("%s\r\n",rsp);
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
+                NRF_LOG_INFO("%s\r\n",rsp);
+            }
+            else if(strstr(cmd,"Hello,World!")!= NULL)
+            {
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
+                NRF_LOG_INFO("%s\r\n",rsp);
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 80, GSM_TYPE_CHAR);
+                NRF_LOG_INFO("%s\r\n",rsp);  
+            }
+            else if (strstr(cmd,"AT+QISEND")!= NULL)
+            {
+                //do nothing
+            }
+            else
+            {
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
+                NRF_LOG_INFO("%s\r\n",rsp);
+            }
+
+            memset(cmd,0,128);
+        }
         vTaskDelay(10000);
     }
 }
-
 #endif
