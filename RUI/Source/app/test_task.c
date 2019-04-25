@@ -123,39 +123,121 @@ void test_task(void * pvParameter)
 
 #else
 
+void hologram_cmd_packet(uint8_t *key, uint8_t *data)
+{
+    uint8_t i = 0;
+    uint8_t j = 0;
+    cmd[0]= '{';
+    cmd[1]= '\"';
+    cmd[2]= 'k';
+    cmd[3]= '\"';
+    cmd[4]= ':';  
+    cmd[5]= '\"';
+    for (i = 0; i < 8; i++)
+    {
+        cmd[6+i] = key[j++];
+    }
+    cmd[14] = '\"';
+    cmd[15] = ',';
+    cmd[16]= '\"';
+    cmd[17]= 'd';
+    cmd[18]= '\"';
+    cmd[19]= ':';  
+    cmd[20]= '\"';
+    j = 0;
+    for (i = 0; i < 128; i++)
+    {
+        if (data[j] != 0)
+        {
+            cmd[21+i] = data[j++];
+        }
+        else
+        {
+            break;
+        }
+    }    
+    cmd[21+j]='\"';
+    cmd[22+j]=',';
+    cmd[23+j]='\"'; 
+    cmd[24+j]='t';       
+    cmd[25+j]='\"';
+    cmd[26+j]=':';
+    cmd[27+j]='\"';  
+    cmd[28+j]='T'; 
+    cmd[29+j]='O'; 
+    cmd[30+j]='P'; 
+    cmd[31+j]='I'; 
+    cmd[32+j]='C';
+    cmd[33+j]='1'; 
+    cmd[34+j]='\"';
+    cmd[35+j]='}';                
+}
 void nb_iot_task(void * pvParameter)
 {
     uint8_t rsp[500] = {0};
+    uint8_t device_key[9] = {0};
+    uint8_t test_data[48] = {0};
+    uint8_t len[20] = {0}; 
+    uint8_t i =0;
+    uint8_t j =0;
+
     while(1)
     {
         if( xSemaphoreTake( xBinarySemaphore_iot, portMAX_DELAY ) == pdTRUE && cmd[0] != 0)
         {
-            itracker_function.communicate_send(cmd);
-            if (strstr(cmd,"AT+QIOPEN")!= NULL)
+            if(strstr(cmd,"SEND")!= NULL)
             {
+                for (i = 5; i < 13; i++)
+                {
+                    device_key[j++] = cmd[i];
+                }
+                j = 0;
+                for (i = 14; i < 128; i++)
+                {
+                    if (cmd[i] != 0)
+                    {
+                        test_data[j++] = cmd[i];
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                memset(cmd,0,128);
+                hologram_cmd_packet(device_key,test_data);
+                NRF_LOG_INFO("device_key = %s\r\n",device_key);
+                NRF_LOG_INFO("test_data = %s\r\n",test_data); 
+                NRF_LOG_INFO("send packet = %s\r\n",cmd);  
+                itracker_function.communicate_send("AT+QIOPEN=1,0,\"TCP\",\"cloudsocket.hologram.io\",9999,0,1");
                 memset(rsp, 0, 500);
                 itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
                 memset(rsp, 0, 500);
-                itracker_function.communicate_response(rsp, 500, 500 * 30, GSM_TYPE_CHAR);
-            }
-            else if(strstr(cmd,"Hello,World!")!= NULL)
-            {
+                itracker_function.communicate_response(rsp, 500, 500 * 20, GSM_TYPE_CHAR);
+                vTaskDelay(500);
+                memset(len,0,20);
+                sprintf(len,"AT+QISEND=0,%d",36+j+1);
+                itracker_function.communicate_send(len);
+                vTaskDelay(500);                              
+                itracker_function.communicate_send(cmd);
                 memset(rsp, 0, 500);
                 itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
                 memset(rsp, 0, 500);
                 itracker_function.communicate_response(rsp, 500, 500 * 80, GSM_TYPE_CHAR);
-            }
-            else if (strstr(cmd,"AT+QISEND")!= NULL)
-            {
-                //do nothing
+                itracker_function.communicate_send("AT+QICLOSE=0");
             }
             else
             {
+                itracker_function.communicate_send(cmd);
                 memset(rsp, 0, 500);
                 itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
             }
 
             memset(cmd,0,128);
+            memset(device_key,0,9);
+            memset(test_data,0,48);
+            memset(len,0,20);
+            i = 0;
+            j = 0;
         }
         vTaskDelay(10000);
     }

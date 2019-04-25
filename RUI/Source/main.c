@@ -934,7 +934,7 @@ int main(void)
     {
         NRF_LOG_INFO("xBinarySemaphore_iot is NULL\r\n");
     }
-    xReturned = xTaskCreate(nb_iot_task, "nb_iot", 512, NULL, 2, NULL);
+	xReturned = xTaskCreate(nb_iot_task, "nb_iot", 512*2, NULL, 2, NULL);
 
 #else
     xReturned = xTaskCreate(test_task, "test", 512, NULL, 2, NULL);
