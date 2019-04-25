@@ -139,6 +139,7 @@ GNU_INSTALL_ROOT := $(PROGFILES)/GNU Tools ARM Embedded/4.9 2015q3/bin/
 GNU_VERSION := 4.9.3  
 GNU_PREFIX := arm-none-eabi
 
+Recommend to use version(7 2018-q2-update) to avoid unpredictable error.
 **3.3 Compile**
 
 After config, enter to SDK/RUI/build/ and execute: make help. The details of RUI will show and you can choose to compile.
