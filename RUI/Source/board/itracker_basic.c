@@ -9,6 +9,7 @@
 #include "app_error.h"
 #include "nrf_soc.h"
 #include "itracker.h"
+#include "gps.h"
 #include "bme280.h"
 #ifdef BG96_TEST
 #include "bg96.h"
@@ -197,7 +198,10 @@ uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
         return 1;
     }
     gps_data_get(data,len);
-
+    if (GpsParseGpsData(data, len))
+    {
+        GpsGetLatestGpsPositionDouble(&gps_lat, &gps_lon);
+    }
     return ret;
 }
 extern char GSM_RSP[1600];

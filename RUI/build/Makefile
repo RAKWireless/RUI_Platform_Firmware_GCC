@@ -179,6 +179,7 @@ ifeq (1, $(word 2, $(P)))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/bc95-g.c
 else ifeq (2, $(word 2, $(P)))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/bg96.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/service/sensor/gps.c
 else ifeq (3, $(word 2, $(P)))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/m35.c
 else ifeq (4, $(word 2, $(P)))

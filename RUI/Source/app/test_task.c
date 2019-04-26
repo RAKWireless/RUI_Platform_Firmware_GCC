@@ -87,7 +87,7 @@ void test_task(void * pvParameter)
         memset(gps_rsp,0,128);
         itracker_function.gps_get(gps_rsp,128);
         vTaskDelay(2000);
-        NRF_LOG_INFO("gps info :%s\r\n",gps_rsp);
+        NRF_LOG_INFO("gps info :%lf,%lf;",gps_lat,gps_lon);
 
 #endif
 
@@ -145,7 +145,7 @@ void hologram_cmd_packet(uint8_t *key, uint8_t *data)
     cmd[19]= ':';  
     cmd[20]= '\"';
     j = 0;
-    for (i = 0; i < 128; i++)
+    for (i = 0; i < 256; i++)
     {
         if (data[j] != 0)
         {
@@ -176,8 +176,21 @@ void nb_iot_task(void * pvParameter)
 {
     uint8_t rsp[500] = {0};
     uint8_t device_key[9] = {0};
-    uint8_t test_data[48] = {0};
+    uint8_t test_data[256] = {0};
     uint8_t len[20] = {0}; 
+    uint8_t sensor_len = 0;
+    double temp = 0;
+    double humidity = 0;
+    double pressure = 0;
+    int x = 0;
+    int y = 0;
+    int z = 0;
+    float magnetic_x = 0;
+    float magnetic_y = 0;
+    float magnetic_z = 0;
+    float light = 0;
+    double lat = 0;
+    double lon = 0;
     uint8_t i =0;
     uint8_t j =0;
 
@@ -192,7 +205,7 @@ void nb_iot_task(void * pvParameter)
                     device_key[j++] = cmd[i];
                 }
                 j = 0;
-                for (i = 14; i < 128; i++)
+                for (i = 14; i < 256; i++)
                 {
                     if (cmd[i] != 0)
                     {
@@ -223,7 +236,58 @@ void nb_iot_task(void * pvParameter)
                 itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
                 memset(rsp, 0, 500);
                 itracker_function.communicate_response(rsp, 500, 500 * 80, GSM_TYPE_CHAR);
-                itracker_function.communicate_send("AT+QICLOSE=0");
+                itracker_function.communicate_send("AT+QICLOSE=0,30000");
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
+            }
+            else if (strstr(cmd,"SENSOR")!= NULL)
+            {
+                for (i = 7; i < 15; i++)
+                {
+                    device_key[j++] = cmd[i];
+                }
+                j = 0;
+                itracker_function.temperature_get(&temp);
+                NRF_LOG_INFO("temperature = %d\r\n",temp);
+                itracker_function.humidity_get(&humidity);
+                NRF_LOG_INFO("humidity = %d\r\n",humidity);
+                itracker_function.pressure_get(&pressure);
+                NRF_LOG_INFO("pressure = %d\r\n",pressure);
+                itracker_function.acceleration_get(&x,&y,&z);
+                NRF_LOG_INFO("acceleration x,y,z = %d mg,%d mg,%d mg",x,y,z);
+                itracker_function.magnetic_get(&magnetic_x,&magnetic_y,&magnetic_z);
+                NRF_LOG_INFO("magnetic x,y,z = %d,%d,%d\r\n",magnetic_x,magnetic_y,magnetic_z);
+                itracker_function.light_strength_get(&light);
+                NRF_LOG_INFO("light strength = %d\r\n",light);
+                itracker_function.gps_get(test_data,256);
+                vTaskDelay(500);
+                NRF_LOG_INFO("gps info :%lf,%lf;",gps_lat,gps_lon);
+                memset(test_data,0,256);
+                sensor_len = sprintf(test_data,"Acc:%d,%d,%d;Tem:%d;Hum:%d;Pre:%d;Mag:%d,%d,%d;Lig:%d;Gps:%lf,%lf;",x,y,z,(int)temp,(int)humidity,(int)pressure,(int)magnetic_x,(int)magnetic_y,(int)magnetic_z,(int)light,gps_lat,gps_lon);
+                memset(cmd,0,128);
+                hologram_cmd_packet(device_key,test_data);
+                NRF_LOG_INFO("device_key = %s\r\n",device_key);
+                NRF_LOG_INFO("test_data = %s\r\n",test_data);
+                NRF_LOG_INFO("test_data len = %d\r\n",sensor_len);                 
+                NRF_LOG_INFO("send packet = %s\r\n",cmd);  
+                itracker_function.communicate_send("AT+QIOPEN=1,0,\"TCP\",\"cloudsocket.hologram.io\",9999,0,1");
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 20, GSM_TYPE_CHAR);
+                vTaskDelay(500);
+                memset(len,0,20);
+                sprintf(len,"AT+QISEND=0,%d",36+sensor_len+1);
+                itracker_function.communicate_send(len);
+                vTaskDelay(500);                              
+                itracker_function.communicate_send(cmd);
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 80, GSM_TYPE_CHAR);
+                itracker_function.communicate_send("AT+QICLOSE=0,30000");
+                memset(rsp, 0, 500);
+                itracker_function.communicate_response(rsp, 500, 500 * 60, GSM_TYPE_CHAR);
             }
             else
             {
@@ -234,8 +298,9 @@ void nb_iot_task(void * pvParameter)
 
             memset(cmd,0,128);
             memset(device_key,0,9);
-            memset(test_data,0,48);
+            memset(test_data,0,256);
             memset(len,0,20);
+            sensor_len = 0;
             i = 0;
             j = 0;
         }
