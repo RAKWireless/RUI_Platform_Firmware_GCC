@@ -11,9 +11,11 @@
 9.AT+QIACT? 									// Query the APN assigned IP address
 10.SEND,device_key,test data					//send data according to your device key,the length of test data is less than 100
 												//this cmd will automatically send you data to server, just wait for 20s 
-For example: 
-SEND,SEND,+C7pOb8=,12345678
+11.SENSOR,device_key					//send all sensor data of 8212 to server
 
+For example: 
+SEND,+C7pOb8=,12345678
+SENSOR,+C7pOb8=
 
 
 Notes:
