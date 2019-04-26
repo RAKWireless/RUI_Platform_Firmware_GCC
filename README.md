@@ -1,5 +1,11 @@
 ***************************************************************************************************************************************
 
+Update log 2019.4.26
+
+1.NB-IOT test with Hologram bug fix. Add a new cmd to support sostenuto data send via hologram now. But remeber to wait the last responce "OK" in each send which will cost 20s because of the hologram server responce time. About cmd details, refer to the Hologram connect cmd.txt in RUI\doc\. 
+
+***************************************************************************************************************************************
+
 Update log 2019.4.25
 
 1.NB-IOT test with Hologram bug fix. About cmd details, refer to the Hologram connect cmd.txt in RUI\doc\. 
