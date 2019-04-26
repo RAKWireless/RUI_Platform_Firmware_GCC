@@ -198,6 +198,7 @@ uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
         return 1;
     }
     gps_data_get(data,len);
+	memcpy(data,&data[14],len-14);
     if (GpsParseGpsData(data, len))
     {
         GpsGetLatestGpsPositionDouble(&gps_lat, &gps_lon);
