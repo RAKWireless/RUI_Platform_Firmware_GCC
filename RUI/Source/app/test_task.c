@@ -177,6 +177,7 @@ void nb_iot_task(void * pvParameter)
     uint8_t rsp[500] = {0};
     uint8_t device_key[9] = {0};
     uint8_t test_data[256] = {0};
+	uint8_t gps_data[128] = {0};
     uint8_t len[20] = {0}; 
     uint8_t sensor_len = 0;
     double temp = 0;
@@ -282,8 +283,9 @@ void nb_iot_task(void * pvParameter)
                 NRF_LOG_INFO("humidity = %d\r\n",humidity);
 #endif
 
-                itracker_function.gps_get(test_data,256);
+                itracker_function.gps_get(gps_data,128);
                 vTaskDelay(500);
+				NRF_LOG_INFO("GPS = %s\r\n",gps_data);
                 NRF_LOG_INFO("gps info :%lf,%lf;",gps_lat,gps_lon);
                 memset(test_data,0,256);
                 sensor_len = sprintf(test_data,"Acc:%d,%d,%d;Tem:%d;Hum:%d;Pre:%d;Mag:%d,%d,%d;Lig:%d;Gps:%lf,%lf;",x,y,z,(int)temp,(int)humidity,(int)pressure,(int)magnetic_x,(int)magnetic_y,(int)magnetic_z,(int)light,gps_lat,gps_lon);
@@ -322,6 +324,7 @@ void nb_iot_task(void * pvParameter)
             memset(cmd,0,128);
             memset(device_key,0,9);
             memset(test_data,0,256);
+			memset(gps_data,0,256);
             memset(len,0,20);
             sensor_len = 0;
             i = 0;
