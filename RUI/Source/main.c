@@ -359,10 +359,10 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
         static portBASE_TYPE xHigherPriorityTaskWoken;
         xHigherPriorityTaskWoken = pdFALSE; 
         xSemaphoreGive( xBinarySemaphore_iot); 
-        //after give the Semaphore,must call portYIELD_FROM_ISR to excute task exchange
+		//after give the Semaphore,must call portYIELD to excute task exchange
         if(xHigherPriorityTaskWoken == pdTRUE )
         {
-            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+			portYIELD();
         }
 #endif
     }

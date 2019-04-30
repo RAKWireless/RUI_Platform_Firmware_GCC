@@ -247,18 +247,41 @@ void nb_iot_task(void * pvParameter)
                     device_key[j++] = cmd[i];
                 }
                 j = 0;
+
+#ifdef BEM280_TEST
                 itracker_function.temperature_get(&temp);
                 NRF_LOG_INFO("temperature = %d\r\n",temp);
                 itracker_function.humidity_get(&humidity);
                 NRF_LOG_INFO("humidity = %d\r\n",humidity);
                 itracker_function.pressure_get(&pressure);
                 NRF_LOG_INFO("pressure = %d\r\n",pressure);
+#endif
+
+#ifdef LPS22HB_TEST
+                itracker_function.pressure_get(&pressure);
+                NRF_LOG_INFO("pressure = %d hPa\r\n",pressure); 
+#endif
+#ifdef LIS3DH_TEST
                 itracker_function.acceleration_get(&x,&y,&z);
                 NRF_LOG_INFO("acceleration x,y,z = %d mg,%d mg,%d mg",x,y,z);
+
+#endif
+#ifdef LIS2MDL_TEST
                 itracker_function.magnetic_get(&magnetic_x,&magnetic_y,&magnetic_z);
                 NRF_LOG_INFO("magnetic x,y,z = %d,%d,%d\r\n",magnetic_x,magnetic_y,magnetic_z);
+#endif
+#ifdef OPT3001_TEST
                 itracker_function.light_strength_get(&light);
                 NRF_LOG_INFO("light strength = %d\r\n",light);
+#endif
+
+#if defined(SHT31_TEST) || defined(SHTC3_TEST)
+                itracker_function.temperature_get(&temp);
+                NRF_LOG_INFO("temperature = %d\r\n",temp);
+                itracker_function.humidity_get(&humidity);
+                NRF_LOG_INFO("humidity = %d\r\n",humidity);
+#endif
+
                 itracker_function.gps_get(test_data,256);
                 vTaskDelay(500);
                 NRF_LOG_INFO("gps info :%lf,%lf;",gps_lat,gps_lon);
