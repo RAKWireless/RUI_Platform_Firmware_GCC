@@ -81,6 +81,13 @@ ifeq (1, $(word 1, $(P)))
   SRC_FILES += $(SDK_ROOT)/components/ble/peer_manager/pm_mutex.c
 endif
 
+ifeq (1, $(DFU_SUPPORT))
+  SRC_FILES += $(SDK_ROOT)/components/ble/ble_services/ble_dfu/ble_dfu.c
+  SRC_FILES += $(SDK_ROOT)/components/ble/ble_services/ble_dfu/ble_dfu_unbonded.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_svci.c
+  SRC_FILES += $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c
+endif
+
 SRC_FILES += \
   $(SDK_ROOT)/RUI/Source/main.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uart.c \
@@ -262,6 +269,14 @@ ifeq (4, $(word 2, $(P)))
   INC_FOLDERS += $(SDK_ROOT)/modules/nrfx/drivers/include
 endif
 
+ifeq (1, $(DFU_SUPPORT))
+  INC_FOLDERS += $(SDK_ROOT)/components/ble/ble_services/ble_dfu 
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/bootloader 
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/bootloader/ble_dfu 
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/bootloader/dfu 
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/pwr_mgmt 
+  INC_FOLDERS += $(SDK_ROOT)/components/libraries/svc 
+endif
 
 INC_FOLDERS += \
   $(SDK_ROOT)/components \
@@ -411,6 +426,13 @@ ifeq (1, $(SLEEP_MODE))
 endif
 ifeq (1, $(ACCESS_NET_TEST))
    CFLAGS += -DACCESS_NET_TEST
+endif
+
+ifeq (1, $(DFU_SUPPORT))
+  CFLAGS += -DDFU_SUPPORT
+  CFLAGS += -DBL_SETTINGS_ACCESS_ONLY
+  CFLAGS += -DNRF_DFU_SVCI_ENABLED
+  CFLAGS += -DNRF_DFU_TRANSPORT_BLE=1
 endif
 
 CFLAGS += -DSOFTDEVICE_PRESENT

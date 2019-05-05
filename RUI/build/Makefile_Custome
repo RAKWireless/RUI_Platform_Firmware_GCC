@@ -13,3 +13,7 @@ SLEEP_MODE = 0
 #part 3 nb-iot test
 #0------off      1------on
 ACCESS_NET_TEST = 0
+
+#Part 4 dfu support
+#0------off      1------on
+DFU_SUPPORT = 0

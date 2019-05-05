@@ -1238,6 +1238,26 @@
 //==========================================================
 // <h> ble_dfu - Device Firmware Update
 
+
+#ifdef DFU_SUPPORT
+
+//==========================================================
+// <q> BLE_DFU_ENABLED  - Enable DFU Service.
+ 
+
+#ifndef BLE_DFU_ENABLED
+#define BLE_DFU_ENABLED 1
+#endif
+
+// <q> NRF_DFU_BLE_BUTTONLESS_SUPPORTS_BONDS  - Buttonless DFU supports bonds.
+ 
+
+#ifndef NRF_DFU_BLE_BUTTONLESS_SUPPORTS_BONDS
+#define NRF_DFU_BLE_BUTTONLESS_SUPPORTS_BONDS 0
+#endif
+
+#else
+
 //==========================================================
 // <q> BLE_DFU_ENABLED  - Enable DFU Service.
  
@@ -1251,6 +1271,8 @@
 
 #ifndef NRF_DFU_BLE_BUTTONLESS_SUPPORTS_BONDS
 #define NRF_DFU_BLE_BUTTONLESS_SUPPORTS_BONDS 0
+#endif
+    
 #endif
 
 // </h> 
@@ -11544,6 +11566,20 @@
 #define NRF_SDH_BLE_GATT_MAX_MTU_SIZE 247
 #endif
 
+#ifdef DFU_SUPPORT
+
+// <o> NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE - Attribute Table size in bytes. The size must be a multiple of 4. 
+#ifndef NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE
+#define NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE 1408
+#endif
+
+// <o> NRF_SDH_BLE_VS_UUID_COUNT - The number of vendor-specific UUIDs. 
+#ifndef NRF_SDH_BLE_VS_UUID_COUNT
+#define NRF_SDH_BLE_VS_UUID_COUNT 2
+#endif
+
+#else
+    
 // <o> NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE - Attribute Table size in bytes. The size must be a multiple of 4. 
 #ifndef NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE
 #define NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE 1408
@@ -11554,6 +11590,7 @@
 #define NRF_SDH_BLE_VS_UUID_COUNT 1
 #endif
 
+#endif
 // <q> NRF_SDH_BLE_SERVICE_CHANGED  - Include the Service Changed characteristic in the Attribute Table.
  
 

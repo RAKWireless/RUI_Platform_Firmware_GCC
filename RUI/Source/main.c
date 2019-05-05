@@ -97,6 +97,10 @@
 #include "itracker.h"
 #include "hal_uart.h"
 
+#ifdef DFU_SUPPORT
+#include "ble_dfu.h"
+#endif
+
 #define APP_BLE_CONN_CFG_TAG            1                                           /**< A tag identifying the SoftDevice BLE configuration. */
 
 #define APP_FEATURE_NOT_SUPPORTED       BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2        /**< Reply when unsupported features are requested. */
@@ -370,7 +374,84 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
 }
 /**@snippet [Handling the data received over BLE] */
 
+#ifdef DFU_SUPPORT
 
+static void advertising_config_get(ble_adv_modes_config_t * p_config)
+{
+    memset(p_config, 0, sizeof(ble_adv_modes_config_t));
+
+    p_config->ble_adv_fast_enabled  = true;
+    p_config->ble_adv_fast_interval = APP_ADV_INTERVAL;
+    p_config->ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;
+}
+
+static void disconnect(uint16_t conn_handle, void * p_context)
+{
+    UNUSED_PARAMETER(p_context);
+
+    ret_code_t err_code = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+    if (err_code != NRF_SUCCESS)
+    {
+        NRF_LOG_WARNING("Failed to disconnect connection. Connection handle: %d Error: %d", conn_handle, err_code);
+    }
+    else
+    {
+        NRF_LOG_DEBUG("Disconnected connection handle %d", conn_handle);
+    }
+}
+
+/**@brief Function for handling dfu events from the Buttonless Secure DFU service
+ *
+ * @param[in]   event   Event from the Buttonless Secure DFU service.
+ */
+static void ble_dfu_evt_handler(ble_dfu_buttonless_evt_type_t event)
+{
+    switch (event)
+    {
+        case BLE_DFU_EVT_BOOTLOADER_ENTER_PREPARE:
+        {
+            NRF_LOG_INFO("Device is preparing to enter bootloader mode.");
+
+            // Prevent device from advertising on disconnect.
+            ble_adv_modes_config_t config;
+            advertising_config_get(&config);
+            config.ble_adv_on_disconnect_disabled = true;
+            ble_advertising_modes_config_set(&m_advertising, &config);
+
+            // Disconnect all other bonded devices that currently are connected.
+            // This is required to receive a service changed indication
+            // on bootup after a successful (or aborted) Device Firmware Update.
+            uint32_t conn_count = ble_conn_state_for_each_connected(disconnect, NULL);
+            NRF_LOG_INFO("Disconnected %d links.", conn_count);
+            break;
+        }
+
+        case BLE_DFU_EVT_BOOTLOADER_ENTER:
+            // YOUR_JOB: Write app-specific unwritten data to FLASH, control finalization of this
+            //           by delaying reset by reporting false in app_shutdown_handler
+            NRF_LOG_INFO("Device will enter bootloader mode.");
+            break;
+
+        case BLE_DFU_EVT_BOOTLOADER_ENTER_FAILED:
+            NRF_LOG_ERROR("Request to enter bootloader mode failed asynchroneously.");
+            // YOUR_JOB: Take corrective measures to resolve the issue
+            //           like calling APP_ERROR_CHECK to reset the device.
+            break;
+
+        case BLE_DFU_EVT_RESPONSE_SEND_ERROR:
+            NRF_LOG_ERROR("Request to send a response to client failed.");
+            // YOUR_JOB: Take corrective measures to resolve the issue
+            //           like calling APP_ERROR_CHECK to reset the device.
+            APP_ERROR_CHECK(false);
+            break;
+
+        default:
+            NRF_LOG_ERROR("Unknown event from ble_dfu_buttonless.");
+            break;
+    }
+}
+
+#endif
 /**@brief Function for initializing services that will be used by the application.
  */
 static void services_init(void)
@@ -384,6 +465,21 @@ static void services_init(void)
 
     err_code = ble_nus_init(&m_nus, &nus_init);
     APP_ERROR_CHECK(err_code);
+
+#ifdef DFU_SUPPORT
+
+    ble_dfu_buttonless_init_t dfus_init = {0};
+
+    // Initialize the async SVCI interface to bootloader.
+    err_code = ble_dfu_buttonless_async_svci_init();
+    APP_ERROR_CHECK(err_code); 
+
+    dfus_init.evt_handler = ble_dfu_evt_handler; 
+
+    err_code = ble_dfu_buttonless_init(&dfus_init);
+    APP_ERROR_CHECK(err_code);
+
+#endif
 }
 
 
