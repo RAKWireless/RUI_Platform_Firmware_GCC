@@ -193,13 +193,24 @@ uint32_t get_opt3001_data_bus(float *light_data)
 uint32_t gps_data_get_bus(uint8_t *data, uint32_t len)
 {
     uint32_t ret = 0;
+    uint8_t i = 0;
     if(data == NULL || len < 0)
     {
         return 1;
     }
     gps_data_get(data,len);
 	memcpy(data,&data[14],len-14);
-    gps_parse(data);
+    for (i = 0; data[i] !=0; i++)
+    {
+        
+        if (data[i] == '\r' || data[i] == '\n')
+        {
+
+            break;
+        }
+    }
+    memset(&data[i],0,127-i);
+    //gps_parse(data);
 
     return ret;
 }
