@@ -87,7 +87,7 @@ void test_task(void * pvParameter)
         memset(gps_rsp,0,128);
         itracker_function.gps_get(gps_rsp,128);
         vTaskDelay(2000);
-        NRF_LOG_INFO("gps info :%lf,%lf;",gps_lat,gps_lon);
+        NRF_LOG_INFO("gps info :%s;",gps_rsp);
 
 #endif
 
@@ -286,9 +286,8 @@ void nb_iot_task(void * pvParameter)
                 itracker_function.gps_get(gps_data,128);
                 vTaskDelay(500);
 				NRF_LOG_INFO("GPS = %s\r\n",gps_data);
-                NRF_LOG_INFO("gps info :%lf,%lf;",gps_lat,gps_lon);
                 memset(test_data,0,256);
-                sensor_len = sprintf(test_data,"Acc:%d,%d,%d;Tem:%d;Hum:%d;Pre:%d;Mag:%d,%d,%d;Lig:%d;Gps:%lf,%lf;",x,y,z,(int)temp,(int)humidity,(int)pressure,(int)magnetic_x,(int)magnetic_y,(int)magnetic_z,(int)light,gps_lat,gps_lon);
+                sensor_len = sprintf(test_data,"Acc:%d,%d,%d;Tem:%d;Hum:%d;Pre:%d;Mag:%d,%d,%d;Lig:%d;Gps:%s;",x,y,z,(int)temp,(int)humidity,(int)pressure,(int)magnetic_x,(int)magnetic_y,(int)magnetic_z,(int)light,gps_data);
                 memset(cmd,0,128);
                 hologram_cmd_packet(device_key,test_data);
                 NRF_LOG_INFO("device_key = %s\r\n",device_key);

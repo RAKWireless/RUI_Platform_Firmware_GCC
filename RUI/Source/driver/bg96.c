@@ -531,6 +531,37 @@ void gps_data_checksum(char *str)
     }
     
 }
+
+void gps_parse(uint8_t *data)
+{
+    uint8_t gps_info[50] = {0};  
+    int i = 0;
+    int i_gps = 0;
+    int j_d = 0;
+    for (i = 0; data[i] != 0 ; i++)
+    {
+        if (data[i] == ',')
+        {
+            j_d++;
+            i++;
+        }
+        if (j_d==2)
+        {
+            break;
+        }
+    }
+    for (i; data[i] != 0; i++)
+    {
+        if (data[i] == 'E' || data[i] == 'W')
+        {   
+            break;
+        }
+        gps_info[i_gps++]=data[i];
+    }
+    gps_info[i_gps] = data[i];
+    memset(data,0,128);
+    memcpy(data,gps_info,i_gps+1);
+}
 void gps_data_get(uint8_t *data, uint8_t len)
 {
     int ret = -1;
