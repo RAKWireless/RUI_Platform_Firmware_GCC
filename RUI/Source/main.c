@@ -827,9 +827,14 @@ static void advertising_init(void)
 
 /**@brief Function for initializing the nrf log module.
  */
+uint32_t get_rtc_counter(void)
+{
+    return NRF_RTC1->COUNTER;
+} 
+
 void log_init(void)
 {
-    ret_code_t err_code = NRF_LOG_INIT(NULL);
+    ret_code_t err_code = NRF_LOG_INIT(get_rtc_counter);
     APP_ERROR_CHECK(err_code);
 
     NRF_LOG_DEFAULT_BACKENDS_INIT();
