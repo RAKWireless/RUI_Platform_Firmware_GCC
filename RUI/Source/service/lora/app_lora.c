@@ -263,6 +263,7 @@ void read_lora_config(void)
        NRF_LOG_INFO("AppKey:");
        dump_hex2str(AppKey , 16);
 #else
+       memcpy(&g_lora_cfg_t,LORA_CONFIG_START_ADDRESS,sizeof(g_lora_cfg_t));
        memcpy(NwkSKey,g_lora_cfg_t.nwkskey,sizeof(NwkSKey));    
        memcpy(AppSKey,g_lora_cfg_t.appskey,sizeof(AppSKey));
        memcpy(DevAddr,g_lora_cfg_t.dev_addr,sizeof(DevAddr)); 
