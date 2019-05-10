@@ -116,7 +116,6 @@ GpioIrqHandler *lora[]={tx_rx_handle,NULL,NULL,NULL};
 
 void SX1276IoIrqInit( DioIrqHandler **irqHandlers )
 {
-    NRF_LOG_DEBUG("SX1276IoIrqInit\r\n");
     GpioSetInterrupt( &SX1276.DIO0, IRQ_RISING_EDGE, IRQ_HIGH_PRIORITY, lora[0]);
     GpioSetInterrupt( &SX1276.DIO1, IRQ_RISING_EDGE, IRQ_HIGH_PRIORITY, irqHandlers[1] );
     //GpioSetInterrupt( &SX1276.DIO2, IRQ_RISING_EDGE, IRQ_HIGH_PRIORITY, irqHandlers[2] );

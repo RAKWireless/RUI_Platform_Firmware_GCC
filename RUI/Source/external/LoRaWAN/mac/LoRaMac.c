@@ -2326,7 +2326,7 @@ LoRaMacStatus_t LoRaMacInitialization( LoRaMacPrimitives_t *primitives, LoRaMacC
         return LORAMAC_STATUS_PARAMETER_INVALID;
     }
     // Verify if the region is supported
-    NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: %s \r\n\r\n", rw_Region2Str(region));
+
     if( RegionIsActive( region ) == false )
     {
         return LORAMAC_STATUS_REGION_NOT_SUPPORTED;

@@ -216,19 +216,66 @@ struct ComplianceTest_s
 lora_cfg_t g_lora_cfg_t;
 
 uint32_t LORA_CONFIG_START_ADDRESS = 0x0007F000;
+void dump_hex2str(uint8_t *buf , uint8_t len);
 
+void lora_region_print()
+{
+#if defined( REGION_AS923 )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_AS923 \r\n");    
+#elif defined( REGION_AU915 )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_AU915 \r\n");    
+#elif defined( REGION_CN470 )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_CN470 \r\n"); 
+#elif defined( REGION_CN779 )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_CN779 \r\n"); 
+#elif defined( REGION_EU433 )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_EU433 \r\n");
+#elif defined( REGION_EU868 )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_EU868 \r\n");
+#elif defined( REGION_IN865 )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_IN865 \r\n");
+#elif defined( REGION_KR920 )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_KR920 \r\n");
+#elif defined( REGION_US915 )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_US915 \r\n");
+#elif defined( REGION_US915_HYBRID )
+	NRF_LOG_INFO("\r\nSelected LoraWAN 1.0.2 Region: REGION_US915_HYBRID \r\n");
+#else
+#error "Please define a region in the compiler options."
+#endif
+
+}
 void read_lora_config(void)
 {
+	   lora_region_print();
+#if( OVER_THE_AIR_ACTIVATION != 0 )
+
        memcpy(&g_lora_cfg_t,LORA_CONFIG_START_ADDRESS,sizeof(g_lora_cfg_t));
        memcpy(DevEui,g_lora_cfg_t.dev_eui,sizeof(DevEui));
        memcpy(AppEui,g_lora_cfg_t.app_eui,sizeof(AppEui));
        memcpy(AppKey,g_lora_cfg_t.app_key,sizeof(AppKey)); 
-#if( OVER_THE_AIR_ACTIVATION == 0 )
-
+       
+       NRF_LOG_INFO("Lora OTAA config: \r\n");
+       NRF_LOG_INFO("Dev_EUI:");
+       dump_hex2str(DevEui, 8);
+       NRF_LOG_INFO("AppEui:");
+       dump_hex2str(AppEui , 8);
+       NRF_LOG_INFO("AppKey:");
+       dump_hex2str(AppKey , 16);
+#else
        memcpy(NwkSKey,g_lora_cfg_t.nwkskey,sizeof(NwkSKey));    
        memcpy(AppSKey,g_lora_cfg_t.appskey,sizeof(AppSKey));
-       memcpy(DevAddr,g_lora_cfg_t.dev_addr,sizeof(DevAddr));     
- #endif
+       memcpy(DevAddr,g_lora_cfg_t.dev_addr,sizeof(DevAddr)); 
+       NRF_LOG_INFO("Lora ABP config: \r\n");
+       NRF_LOG_INFO("Dev_EUI: ");
+       dump_hex2str(DevEui , 8);
+       NRF_LOG_INFO("DevAddr: %08X\r\n", DevAddr);
+       NRF_LOG_INFO("NwkSKey: ");
+       dump_hex2str(NwkSKey , 16);
+       NRF_LOG_INFO("AppSKey: ");
+       dump_hex2str(AppSKey , 16);
+
+#endif
 }
 
 void write_lora_config(void)
@@ -245,7 +292,7 @@ void write_lora_config(void)
 
 void dump_hex2str(uint8_t *buf , uint8_t len)
 {
-    uint8_t str[56] = {};
+    uint8_t str[56] = {0};
     
     for(uint8_t i=0; i<len; i++) {
         sprintf(str+i*2,"%02X",buf[i]);
@@ -791,13 +838,6 @@ void region_init()
             // Initialize LoRaMac device unique ID
             //BoardGetUniqueId( DevEui );
             
-            NRF_LOG_INFO("OTAA: \r\n");
-            NRF_LOG_INFO("Dev_EUI:");
-            dump_hex2str(DevEui, 8);
-            NRF_LOG_INFO("AppEui:");
-            dump_hex2str(AppEui , 8);
-            NRF_LOG_INFO("AppKey:");
-            dump_hex2str(AppKey , 16);
             
             mlmeReq.Type = MLME_JOIN;
             
@@ -830,8 +870,7 @@ void region_init()
                 status = LoRaMacMlmeRequest( &mlmeReq );
                 NRF_LOG_INFO("OTAA Join Start...%d \r\n", status);
             }
-            //DeviceState = DEVICE_STATE_SLEEP;
-            NRF_LOG_INFO("goto to sleep");
+
 #else
             // Choose a random device address if not already defined in Commissioning.h
             if( DevAddr == 0 )
@@ -842,15 +881,7 @@ void region_init()
                 // Choose a random device address
                 DevAddr = randr( 0, 0x01FFFFFF );
             }
-            
-            NRF_LOG_INFO("ABP: \r\n");
-            NRF_LOG_INFO("Dev_EUI: ");
-            dump_hex2str(DevEui , 8);
-            NRF_LOG_INFO("DevAddr: %08X\r\n", DevAddr);
-            NRF_LOG_INFO("NwkSKey: ");
-            dump_hex2str(NwkSKey , 16);
-            NRF_LOG_INFO("AppSKey: ");
-            dump_hex2str(AppSKey , 16);
+
             
             mibReq.Type = MIB_NET_ID;
             mibReq.Param.NetID = LORAWAN_NETWORK_ID;
