@@ -32,7 +32,7 @@ void sensors_init()
     Gps_Init();
 #endif
 
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
     lora_init();
 #endif
 

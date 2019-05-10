@@ -7,23 +7,26 @@
 /**
  * Pin definitions
  */
-#define RADIO_DIO_0		P7
-#define RADIO_DIO_1		P8
-#define RADIO_DIO_2		P9
-#define RADIO_DIO_3		P10
+#define RADIO_DIO_0		P27
+#define RADIO_DIO_1		P28
+#define RADIO_DIO_2		P29
+#define RADIO_DIO_3		P30
+#define RADIO_DIO_4		P31
 
-#define RADIO_NSS		P14
-#define RADIO_MOSI		P13
-#define RADIO_MISO		P12
-#define RADIO_SCK		P11
 
-#define RADIO_RESET		P6
+#define RADIO_NSS		P4
+#define RADIO_MOSI		P5
+#define RADIO_MISO		P6
+#define RADIO_SCK		P7
+
+#define RADIO_RESET		P3
 #define RADIO_TCXO		P5
-#define RADIO_RF_CTX	        P23
-#define RADIO_RF_CPS	        P22
+#define RADIO_RF_CTX	        P15
+#define RADIO_RF_CPS	        P16
 
 
-#define RF_ANT_INIT		1
+#define RF_ANT_INIT		0
+
 
 #define ASSERT_ERROR	0xA55EA55E
 

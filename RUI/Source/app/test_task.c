@@ -10,7 +10,7 @@
 #include "itracker.h"
 #include "nrf_log.h"
 
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
 extern uint8_t JOIN_FLAG;
 extern lora_cfg_t g_lora_cfg_t;
 int lora_send_ok = 0;
@@ -44,7 +44,7 @@ void test_task(void * pvParameter)
     float light = 0;
     double lat = 0;
     double lon = 0;
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
     if(g_lora_cfg_t.sof == LORA_CONFIG_MAGIC)
     {
        region_init();
@@ -98,7 +98,7 @@ void test_task(void * pvParameter)
            NRF_LOG_INFO("humidity = %d\r\n",humidity);
 #endif
 
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
         if(JOIN_FLAG==1)
         {
             memset(lora_data,0,128);
@@ -113,7 +113,7 @@ void test_task(void * pvParameter)
         }
         
 #endif
-#if defined(SLEEP_MODE) && !defined(LORA_TEST)
+#if defined(SLEEP_MODE) && !defined(LORA_81x_TEST) && !defined(LORA_4600_TEST)
         power_save_open();
 #endif
         NRF_LOG_INFO("++++++++++++++++test end++++++++++++++++\r\n");

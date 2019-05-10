@@ -199,6 +199,16 @@ else ifeq (4, $(word 2, $(P)))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/system/crypto/cmac.c
   SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionCommon.c
   SRC_FILES += $(SDK_ROOT)/RUI/Source/service/lora/app_lora.c
+else ifeq (5, $(word 2, $(P)))
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/sx1276_lora.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/radio/sx1276/sx1276.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/Region.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/LoRaMac.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/LoRaMacCrypto.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/system/crypto/aes.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/system/crypto/cmac.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region/RegionCommon.c
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/service/lora/app_lora.c
 endif
 
 ifeq (1, $(findstring 1, $(wordlist 3, $(NUM), $(P))))
@@ -253,13 +263,25 @@ endif
 ifeq (1, $(word 1, $(P)))
 	ifeq (4, $(word 2, $(P)))
     		INC_FOLDERS += $(SDK_ROOT)/RUI/Source/config/52832_board/lora815
-	else
-        	INC_FOLDERS += $(SDK_ROOT)/RUI/Source/config/52832_board/itracker
-    	endif
+	else ifeq (5, $(word 2, $(P)))
+        INC_FOLDERS += $(SDK_ROOT)/RUI/Source/config/52832_board/lora4600
+  else
+        INC_FOLDERS += $(SDK_ROOT)/RUI/Source/config/52832_board/itracker
+  endif
 endif
 
 
 ifeq (4, $(word 2, $(P)))
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/radio
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/radio/sx1276
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/system/crypto
+  INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/system
+  INC_FOLDERS += $(SDK_ROOT)/modules/nrfx/drivers/include
+endif
+
+ifeq (5, $(word 2, $(P)))
   INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/radio
   INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac
   INC_FOLDERS += $(SDK_ROOT)/RUI/Source/external/LoRaWAN/mac/region
@@ -370,7 +392,10 @@ ifeq (3, $(word 2, $(P)))
   CFLAGS += -DM35_TEST
 endif
 ifeq (4, $(word 2, $(P)))
-  CFLAGS += -DLORA_TEST
+  CFLAGS += -DLORA_81x_TEST
+endif
+ifeq (5, $(word 2, $(P)))
+  CFLAGS += -DLORA_4600_TEST
 endif
 
 ifeq (1, $(findstring 1, $(wordlist 3, $(NUM), $(P))))
@@ -535,8 +560,8 @@ help:
 *  \033[36m1. nRF52832\033[0m    * \033[35m1. bc95-g\033[0m       * \033[33m1. bme280   2. L_70_R\033[0m            *\n  \
 *  \033[36m2. nRF52840\033[0m    * \033[35m2. bg96\033[0m         * \033[33m3. lis2mdl  4. lis3dh\033[0m            *\n  \
 *                 * \033[35m3. m35\033[0m          * \033[33m5. opt3001\033[0m  \033[33m6. sht31\033[0m             *\n  \
-*                 * \033[35m4. sx1276\033[0m       * \033[33m7. ublox-max7  8. shtc3\033[0m          * \n  \
-*                 *                 * \033[33m9. lps22hb\033[0m                       * \n  \
+*                 * \033[35m4. sx1276(81x)\033[0m  * \033[33m7. ublox-max7  8. shtc3\033[0m          * \n  \
+*                 * \033[35m5. sx1276(4600)\033[0m * \033[33m9. lps22hb\033[0m                       * \n  \
 *                                                                      *\n  \
 *  \033[32m3. Compile command  \033[0m                                                *\n  \
 *                                                                      *\n  \

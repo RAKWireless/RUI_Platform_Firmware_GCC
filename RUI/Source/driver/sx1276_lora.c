@@ -236,8 +236,10 @@ Gpio_t AntSwitchHf_RADIO_RF_CPS;
 void SX1276AntSwInit( void )
 {
 	// Turn On RF switch
-    GpioInit( &AntSwitchHf_RADIO_RF_CTX, RADIO_RF_CTX, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 1 );
-    GpioInit( &AntSwitchHf_RADIO_RF_CPS, RADIO_RF_CPS, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 1 );
+    memset(&AntSwitchHf_RADIO_RF_CTX,0,sizeof(AntSwitchHf_RADIO_RF_CTX));
+    memset(&AntSwitchHf_RADIO_RF_CPS,0,sizeof(AntSwitchHf_RADIO_RF_CPS));
+    GpioInit( &AntSwitchHf_RADIO_RF_CTX, RADIO_RF_CTX, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, RF_ANT_INIT );
+    GpioInit( &AntSwitchHf_RADIO_RF_CPS, RADIO_RF_CPS, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, RF_ANT_INIT );
 }
 
 void SX1276AntSwDeInit( void )

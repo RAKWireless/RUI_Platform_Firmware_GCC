@@ -67,7 +67,7 @@
 #include "lps22hb.h"
 #endif
 
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
 #include "radio.h"
 #include "sx1276.h"
 #include "sx1276_lora.h"

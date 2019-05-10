@@ -9,7 +9,7 @@
 #include "nrf_rtc.h"
 
 GSM_RECEIVE_TYPE g_type = GSM_TYPE_CHAR;
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
 
 const nrf_drv_rtc_t rtc = NRF_DRV_RTC_INSTANCE(2); /**< Declaring an instance of nrf_drv_rtc for RTC0. */
 

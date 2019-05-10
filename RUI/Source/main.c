@@ -155,7 +155,8 @@ xSemaphoreHandle xBinarySemaphore_iot = NULL;
 uint8_t cmd[128] = {0};
 #endif
 
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
+
 uint8_t JOIN_FLAG = 0;  // 0-not connect; 1- connect
 extern int lora_send_ok;
 
@@ -255,7 +256,7 @@ void vApplicationIdleHook( void )
     while(1)
     {
 #ifdef SLEEP_MODE
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
     if(lora_send_ok == 1)
         {
             __WFI();
@@ -348,7 +349,7 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
 
         NRF_LOG_DEBUG("Received data from BLE NUS.");
         NRF_LOG_HEXDUMP_DEBUG(p_evt->params.rx_data.p_data, p_evt->params.rx_data.length);
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
         if(strncmp((char*)p_evt->params.rx_data.p_data, "lora_cfg:", strlen("lora_cfg:")) == 0)
         {
             parse_lora_config((char*)p_evt->params.rx_data.p_data+strlen("lora_cfg:"), &g_lora_cfg_t);
@@ -1016,7 +1017,7 @@ int main(void)
     xReturned = xTaskCreate(dfu_task, "dfu", 512, NULL, 1, NULL);
 #endif
 
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
 
     vSemaphoreCreateBinary(xBinarySemaphore);
     if(xBinarySemaphore == NULL)

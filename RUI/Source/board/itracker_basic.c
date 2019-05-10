@@ -24,7 +24,7 @@
 
 double gps_lat = 0;
 double gps_lon = 0;   
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
 uint32_t lora_send(uint8_t *cmd);
 #endif
 
@@ -314,7 +314,7 @@ void itracker_function_init()
     itracker_function.communicate_response = Gsm_wait_response;
 #endif
 
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
     itracker_function.communicate_send = lora_send;
 #endif
 }

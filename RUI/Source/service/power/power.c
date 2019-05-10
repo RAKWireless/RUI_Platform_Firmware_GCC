@@ -23,7 +23,7 @@
 extern void Gps_standby(void);
 #endif
 
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
 extern void SX1276SetSleep( void );
 extern int lora_send_ok;
 #endif
@@ -66,7 +66,7 @@ void power_save_open()
     SHTC3_Sleep();
 #endif
 
-#ifdef LORA_TEST
+#if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
     if(lora_send_ok == 1)
     {
    	 SX1276SetSleep( );
