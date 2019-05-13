@@ -117,7 +117,7 @@ void test_task(void * pvParameter)
         power_save_open();
 #endif
         NRF_LOG_INFO("++++++++++++++++test end++++++++++++++++\r\n");
-        vTaskDelay(5000);
+        vTaskDelay(60000);
     }
 }
 
