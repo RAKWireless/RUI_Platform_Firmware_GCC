@@ -846,15 +846,37 @@ void region_init()
             mlmeReq.Req.Join.AppEui = AppEui;
             mlmeReq.Req.Join.AppKey = AppKey;
             mlmeReq.Req.Join.NbTrials = 3;
-            
+            //the channel is corresponding to the gateway,this code is according to our server and TTN,
+			//so if connect to gateway slowly, change the channel 
 #if defined ( REGION_US915 )  
             
-            uint16_t ch_mask[5];
-            ch_mask[0] =0xff00;
+            uint16_t ch_mask[6];
+            ch_mask[0] =0xFF00;
             ch_mask[1] =0x0000;
             ch_mask[2] =0x0000;
             ch_mask[3] =0x0000;
             ch_mask[4] =0x0000;
+            ch_mask[5] =0x0000;      
+			
+            mibReq.Type = MIB_CHANNELS_DEFAULT_MASK;  
+            mibReq.Param.ChannelsDefaultMask = ch_mask;
+            LoRaMacMibSetRequestConfirm( &mibReq ); 
+            
+            mibReq.Type = MIB_CHANNELS_MASK;  
+            mibReq.Param.ChannelsDefaultMask = ch_mask;
+            LoRaMacMibSetRequestConfirm( &mibReq );
+            
+#endif 
+
+#if defined ( REGION_CN470 )  
+            
+            uint16_t ch_mask[6];
+            ch_mask[0] =0x0000;
+            ch_mask[1] =0x0000;
+            ch_mask[2] =0x0000;
+            ch_mask[3] =0x0000;
+            ch_mask[4] =0x0000;
+            ch_mask[5] =0x000F;			
             
             mibReq.Type = MIB_CHANNELS_DEFAULT_MASK;  
             mibReq.Param.ChannelsDefaultMask = ch_mask;
@@ -864,7 +886,7 @@ void region_init()
             mibReq.Param.ChannelsDefaultMask = ch_mask;
             LoRaMacMibSetRequestConfirm( &mibReq );
             
-#endif            
+#endif             
             if( NextTx == true )
             {
                 LoRaMacStatus_t status;
