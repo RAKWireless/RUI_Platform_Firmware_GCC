@@ -162,7 +162,6 @@ SRC_FILES += \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
-  $(SDK_ROOT)/RUI/Source/app/test_task.c \
   $(SDK_ROOT)/RUI/Source/board/board_basic.c \
   $(SDK_ROOT)/RUI/Source/board/itracker_basic.c \
   $(SDK_ROOT)/components/libraries/uart/app_uart_fifo.c \
@@ -239,6 +238,15 @@ endif
 ifeq (9, $(findstring 9, $(wordlist 3, $(NUM), $(P))))
   SRC_FILES += $(SDK_ROOT)/RUI/Source/driver/lps22hb.c
 endif
+
+ifeq (1, $(BSP_MODE))
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/app/test_task.c
+endif
+
+ifeq (1, $(ACCESS_NET_TEST))
+  SRC_FILES += $(SDK_ROOT)/RUI/Source/app/hologram_task.c
+endif
+
 
 
 # Include folders common to all targets
@@ -452,6 +460,13 @@ endif
 ifeq (1, $(ACCESS_NET_TEST))
    CFLAGS += -DACCESS_NET_TEST
 endif
+ifeq (1, $(BLE_SUPPORT))
+   CFLAGS += -DBLE_SUPPORT
+endif
+ifeq (1, $(BSP_MODE))
+   CFLAGS += -DBSP_MODE
+endif
+
 
 ifeq (1, $(DFU_SUPPORT))
   CFLAGS += -DDFU_SUPPORT
