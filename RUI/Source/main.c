@@ -244,9 +244,12 @@ static void advertising_start()
  */
 void power_manage(void)
 {
-    power_release_gpio();
+#ifdef BLE_SUPPORT
+	sd_app_evt_wait();
+#else
     __WFI();
-    __WFE();
+    __WFE();	
+#endif
 }
 /**@brief A function which is hooked to idle task.
  * @note Idle hook must be enabled in FreeRTOS configuration (configUSE_IDLE_HOOK).
@@ -259,12 +262,12 @@ void vApplicationIdleHook( void )
 #if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
     if(lora_send_ok == 1)
         {
-            __WFI();
-            __WFE();
+        	power_manage();
+
         }
 #else
-    __WFI();
-    __WFE();
+    	power_manage();
+
 #endif
 
 #endif
