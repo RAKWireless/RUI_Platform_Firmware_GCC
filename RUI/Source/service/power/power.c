@@ -108,3 +108,43 @@ void power_release_gpio()
     nrf_gpio_cfg_default(GPS_RXD_PIN);
 #endif
 }
+
+#ifdef  BATTERY_LEVEL_SUPPORT
+
+void battery_level(void)
+{
+    nrf_saadc_value_t saadc_val;
+    float voltage = 0;
+    int adc_num = 3;
+    nrf_saadc_value_t adc_avg = 0;
+    nrf_saadc_value_t adc_sum = 0;
+    for (int i = 0; i < adc_num; ++i)
+    {
+        nrf_drv_saadc_sample_convert(0,&saadc_val);
+        adc_sum+=saadc_val;
+        delay_ms(300);
+    }
+    adc_avg = adc_sum/adc_num;
+    voltage = ((float)adc_avg * 3.6 / 1024) * 5 / 3;
+    //NRF_LOG_INFO("voltage = %lf V\r\n",voltage);
+    NRF_LOG_INFO("Battery Voltage = "NRF_LOG_FLOAT_MARKER" V !\r\n", NRF_LOG_FLOAT(voltage));
+}
+
+
+
+void saadc_callback(nrf_drv_saadc_evt_t const *p_event){}
+
+
+void saadc_init(void)
+{
+    ret_code_t err_code;
+
+    nrf_saadc_channel_config_t mmysaadc= NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_AIN1);
+
+    err_code=nrf_drv_saadc_init(NULL,saadc_callback);
+    APP_ERROR_CHECK(err_code);
+    err_code = nrf_drv_saadc_channel_init(0, &mmysaadc);
+    APP_ERROR_CHECK(err_code); 
+}
+
+#endif

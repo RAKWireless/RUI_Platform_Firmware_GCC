@@ -10,6 +10,11 @@
 #include "itracker.h"
 #include "nrf_log.h"
 
+
+#ifdef  BATTERY_LEVEL_SUPPORT
+extern void battery_level(void);
+#endif
+
 #if defined(LORA_81x_TEST) || defined(LORA_4600_TEST)
 extern uint8_t JOIN_FLAG;
 extern lora_cfg_t g_lora_cfg_t;
@@ -111,6 +116,9 @@ void test_task(void * pvParameter)
             lora_send_ok = 1; 
         }
         
+#endif
+#ifdef  BATTERY_LEVEL_SUPPORT
+        battery_level();
 #endif
 #if defined(SLEEP_MODE) && !defined(LORA_81x_TEST) && !defined(LORA_4600_TEST)
         power_save_open();

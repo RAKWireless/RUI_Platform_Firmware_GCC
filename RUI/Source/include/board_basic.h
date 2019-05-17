@@ -22,6 +22,7 @@
 #include "hal_gpio.h"
 #include "hal_uart.h"
 #include "pin_define.h"
+#include "nrf_drv_saadc.h"
 
 #ifdef BEM280_TEST
 #include "bme280.h"
@@ -386,6 +387,6 @@ void delay_ms(uint32_t ms);
 void power_save_open();
 void power_save_close();
 void lora_init();
-
+void saadc_init(void);
 void power_manage(void);
 #endif

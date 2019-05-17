@@ -21,18 +21,9 @@
 	#define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */
 
-	
-	//#define BC95
-//#define M35
 
-/*
-		UART PIN Assignment
-		P028_UART1_RX
-		P029_UART1_TX
+#define BATTERY_ADC_PIN		28
 
-*/
-#define             LOG_RXD_PIN                        28
-#define             LOG_TXD_PIN                        29
 
 /*
 		GSM PIN Assignment

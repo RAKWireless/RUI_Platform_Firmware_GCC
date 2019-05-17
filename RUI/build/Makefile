@@ -97,6 +97,7 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_twi.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spim.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_saadc.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
   $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_clock.c \
   $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_power.c \
@@ -434,6 +435,9 @@ ifeq (9, $(findstring 9, $(wordlist 3, $(NUM), $(P))))
   CFLAGS += -DLPS22HB_TEST
 endif
 
+ifeq (1, $(BATTERY_LEVEL_SUPPORT))
+    CFLAGS += -DBATTERY_LEVEL_SUPPORT
+endif
 
 CFLAGS += $(OPT)
 ifeq (2, $(word 1, $(P)))

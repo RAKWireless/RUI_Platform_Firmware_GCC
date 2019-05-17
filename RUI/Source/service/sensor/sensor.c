@@ -128,4 +128,8 @@ void sensors_init()
        }
        	lps22hb_init();
 #endif
+
+#ifdef  BATTERY_LEVEL_SUPPORT
+        saadc_init();
+#endif
 }

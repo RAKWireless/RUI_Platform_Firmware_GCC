@@ -25,3 +25,7 @@ BLE_SUPPORT = 1
 #part 6 bsp test, test sesnors on board
 #0------off      1------on
 BSP_MODE = 1
+
+#part 7 battery level support, support from nRF52840, the range of input volgate cannot exceed 3.6V
+#0------off      1------on
+BATTERY_LEVEL_SUPPORT = 0
