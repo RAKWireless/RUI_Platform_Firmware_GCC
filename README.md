@@ -1,5 +1,14 @@
 ***************************************************************************************************************************************
 
+Update log 2019.5.17
+
+1.Support battery volgate detect from nRF52840. Should open it in Makefile_Custome:
+
+#part 7 battery level support, support from nRF52840
+#0------off      1------on
+BATTERY_LEVEL_SUPPORT = 1
+***************************************************************************************************************************************
+
 Update log 2019.5.10
 
 1.Support our new lora board Rak4600.
